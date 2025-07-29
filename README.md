@@ -6,7 +6,7 @@
 
 A dynamic portfolio showcasing my projects, built with **HTML/CSS/JS** and powered by the GitHub API. Features dark mode, project filtering, and real-time GitHub data.
 
-**Live Demo:** 👉 [https://hhhpraise.github.io/portfolio/](https://hhhpraise.github.io)
+**Live Demo:** 👉 [https://hhhpraise.github.io/portfolio/](https://hhhpraise.github.io/portfolio/)
 
 
 
