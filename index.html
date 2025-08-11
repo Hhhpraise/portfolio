@@ -197,6 +197,7 @@
             transform: translateY(20px);
             animation: cardAppear 0.6s ease forwards;
             border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
         }
 
         .dark-mode .project-card {
@@ -219,6 +220,12 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
         }
 
+        .project-card .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .project-card h2 {
             margin-bottom: 12px;
             color: var(--accent-color);
@@ -232,9 +239,18 @@
             font-size: 1.2rem;
         }
 
+        .project-card .project-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .project-card.expanded .project-details {
+            max-height: 500px;
+        }
+
         .project-card p {
             margin-bottom: 15px;
-            flex-grow: 1;
             color: var(--text-color);
             opacity: 0.9;
         }
@@ -282,7 +298,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: auto;
+            margin-top: 10px;
         }
 
         .tag {
@@ -297,6 +313,32 @@
 
         .tag:hover {
             transform: scale(1.05);
+        }
+
+        .toggle-details {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .toggle-details:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .toggle-details:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .loading {
@@ -513,6 +555,7 @@
 
             .projects-container {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
 
             .filters {
@@ -533,6 +576,95 @@
 
             .chart-title {
                 font-size: 12px;
+            }
+
+            /* Mobile-specific card styling */
+            .project-card {
+                padding: 20px;
+                min-height: auto;
+            }
+
+            .project-card .project-header {
+                margin-bottom: 10px;
+            }
+
+            .project-card h2 {
+                font-size: 1.3rem;
+                margin-bottom: 0;
+                padding-right: 35px; /* Space for toggle button */
+            }
+
+            .project-card .project-details {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.4s ease;
+            }
+
+            .project-card.expanded .project-details {
+                max-height: 1000px;
+            }
+
+            .project-card p {
+                margin-bottom: 12px;
+                font-size: 0.95rem;
+            }
+
+            .project-meta {
+                font-size: 0.8rem;
+                margin-bottom: 12px;
+            }
+
+            .project-links {
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .project-links a {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                flex: 1;
+                min-width: calc(50% - 4px);
+            }
+
+            .tags {
+                margin-top: 8px;
+            }
+
+            .tag {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+
+            .toggle-details {
+                display: flex; /* Show on mobile */
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .profile-pic {
+                width: 60px;
+                height: 60px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .project-card {
+                padding: 15px;
+            }
+
+            .project-card h2 {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -569,7 +701,6 @@
         <button class="filter-btn" data-filter="web">
             <i class="fas fa-globe"></i> Web
         </button>
-
     </div>
 
     <main>
@@ -594,7 +725,6 @@
             <a href="https://www.instagram.com/__praisee" target="_blank" rel="noopener" aria-label="Instagram">
                 <i class="fab fa-instagram"></i>
             </a>
-            <!-- Add this Contact Me button -->
             <a href="mailto:hhhpraise33@gmail.com" class="contact-btn">
                 <i class="fas fa-envelope"></i>
             </a>
@@ -679,18 +809,36 @@
         const projectsContainer = document.getElementById('projects-container');
         const noResults = document.querySelector('.no-results');
 
+        // Toggle project details
+        function toggleProjectDetails(button) {
+            const card = button.closest('.project-card');
+            card.classList.toggle('expanded');
 
+            const icon = button.querySelector('i');
+            if (card.classList.contains('expanded')) {
+                icon.className = 'fas fa-chevron-up';
+            } else {
+                icon.className = 'fas fa-chevron-down';
+            }
+        }
 
-        // Fetch GitHub projects - using sample data for demonstration
+        // Add event delegation for toggle buttons
+        projectsContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.toggle-details')) {
+                toggleProjectDetails(e.target.closest('.toggle-details'));
+            }
+        });
+
+        // Fetch GitHub projects
         async function fetchGitHubProjects() {
             const username = 'Hhhpraise';
             const container = document.getElementById('projects-container');
 
             try {
                 // In a real implementation, you would fetch from GitHub API:
-                 const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+                const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
 
-                  // First check if the response is OK
+                // First check if the response is OK
                 if (!response.ok) {
                     throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
                 }
@@ -703,7 +851,6 @@
 
                 container.innerHTML = ''; // Clear loading message
                 allProjects = [];
-
 
                 // Sort by updated date (newest first)
                 repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
@@ -740,12 +887,19 @@
                     }
 
                     card.innerHTML = `
-                        <h2><i class="fas ${iconClass}"></i> ${repo.name}</h2>
-                        <p>${repo.description || 'No description provided.'}</p>
-                        <div class="project-meta">
-                            <span><i class="far fa-star"></i> ${repo.stargazers_count}</span>
-                            <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
-                            <span><i class="far fa-clock"></i> ${formattedDate}</span>
+                        <div class="project-header">
+                            <h2><i class="fas ${iconClass}"></i> ${repo.name}</h2>
+                            <button class="toggle-details" aria-label="Toggle project details">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="project-details">
+                            <p>${repo.description || 'No description provided.'}</p>
+                            <div class="project-meta">
+                                <span><i class="far fa-star"></i> ${repo.stargazers_count}</span>
+                                <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+                                <span><i class="far fa-clock"></i> ${formattedDate}</span>
+                            </div>
                         </div>
                         <div class="project-links">
                             <a href="${repo.html_url}" target="_blank" rel="noopener">
