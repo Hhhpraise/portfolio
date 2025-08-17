@@ -537,6 +537,29 @@
                 transform: translateY(0);
             }
         }
+        @media (min-width: 769px) {
+            /* Always show project details on desktop */
+            .project-card .project-details {
+                max-height: none !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+
+            /* Hide toggle button on desktop */
+            .toggle-details {
+                display: none !important;
+            }
+
+            /* Remove extra padding needed for mobile toggle */
+            .project-card h2 {
+                padding-right: 0 !important;
+            }
+
+            /* Adjust card spacing for desktop */
+            .project-card {
+                min-height: 320px;
+            }
+        }
 
         @media (max-width: 768px) {
             header {
