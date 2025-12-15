@@ -1,3 +1,5 @@
+// script.js - Complete Fixed Version
+
 // Configuration
 const CONFIG = {
     GITHUB_USERNAME: 'Hhhpraise',
@@ -16,8 +18,12 @@ const state = {
     currentFilter: 'all',
     searchQuery: '',
     sortBy: 'updated',
-    isDarkMode: false
+    isDarkMode: false,
+    languageData: [],
+    isMobile: window.innerWidth <= 768
 };
+
+let languageChart = null;
 
 // DOM Elements
 const elements = {
@@ -58,7 +64,11 @@ const elements = {
     skillsTab: document.querySelector('#skills'),
     publicationsTab: document.querySelector('#publications'),
     publicationsContainer: document.querySelector('#publications-container'),
-    publicationsEmpty: document.querySelector('#publications-empty')
+    publicationsEmpty: document.querySelector('#publications-empty'),
+
+    // Logos
+    logoIcon: document.querySelector('.logo-icon'),
+    footerLogo: document.querySelector('.footer-logo')
 };
 
 // Initialize
@@ -70,8 +80,13 @@ async function initApplication() {
     // Set current year
     elements.currentYear.textContent = new Date().getFullYear();
 
+    // Check if mobile
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     // Initialize components
     initTheme();
+    updateLogos();
     initEventListeners();
     initSkillsAnimation();
 
@@ -92,6 +107,41 @@ async function initApplication() {
     // Console greeting
     console.log('%c🚀 Praise | Software Developer', 'font-size: 18px; font-weight: bold; color: #007aff;');
     console.log('%c✨ Clean, fast portfolio showcasing development work', 'color: #86868b;');
+}
+
+function checkMobile() {
+    state.isMobile = window.innerWidth <= 768;
+}
+
+// Update logos with GitHub avatar
+function updateLogos() {
+    const avatarUrl = `https://github.com/${CONFIG.GITHUB_USERNAME}.png`;
+    
+    // Header logo
+    if (elements.logoIcon) {
+        elements.logoIcon.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = 'Praise';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = 'var(--radius-md)';
+        img.style.objectFit = 'cover';
+        elements.logoIcon.appendChild(img);
+    }
+    
+    // Footer logo
+    if (elements.footerLogo) {
+        elements.footerLogo.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = 'Praise';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = 'var(--radius-md)';
+        img.style.objectFit = 'cover';
+        elements.footerLogo.appendChild(img);
+    }
 }
 
 // Theme Management
@@ -119,8 +169,39 @@ function toggleTheme() {
         : '<i class="fas fa-moon"></i>';
 
     // Re-render chart if exists
-    if (window.languageChart) {
+    if (languageChart) {
         setTimeout(renderLanguageChart, 100);
+    }
+}
+
+function getCachedData(key, maxAgeMinutes = 60) {
+    try {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+
+        const { data, timestamp } = JSON.parse(cached);
+        const age = Date.now() - timestamp;
+        const maxAge = maxAgeMinutes * 60 * 1000;
+
+        if (age < maxAge) {
+            return data;
+        }
+        // Cache expired
+        localStorage.removeItem(key);
+        return null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function setCachedData(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify({
+            data: data,
+            timestamp: Date.now()
+        }));
+    } catch (error) {
+        console.log('Error caching data:', error);
     }
 }
 
@@ -183,8 +264,8 @@ function initEventListeners() {
     // Sort
     elements.sortSelect.addEventListener('change', (e) => {
         state.sortBy = e.target.value;
-        sortProjects();
-        renderProjects();
+        state.currentPage = 1;
+        filterAndRenderProjects();
     });
 
     // Pagination
@@ -242,88 +323,227 @@ function initSkillsAnimation() {
 // GitHub Data Fetching
 async function fetchGitHubData() {
     try {
-        const [repos, user] = await Promise.all([
-            fetch(`https://api.github.com/users/${CONFIG.GITHUB_USERNAME}/repos?per_page=100`).then(r => r.json()),
-            fetch(`https://api.github.com/users/${CONFIG.GITHUB_USERNAME}`).then(r => r.json())
-        ]);
+        // Try to get cached data first
+        const cacheKey = `github_data_${CONFIG.GITHUB_USERNAME}`;
+        const cached = getCachedData(cacheKey, 60); // 60 minutes cache
 
-        if (!Array.isArray(repos)) throw new Error('Invalid GitHub API response');
+        if (cached && cached.repos && cached.user) {
+            console.log('Using cached GitHub data');
+            state.projects = cached.projects;
+            state.languageData = cached.languageData || [];
 
-        // Process repositories
-        state.projects = await Promise.all(repos.map(async repo => {
-            const isExecutable = CONFIG.EXECUTABLE_PROJECTS[repo.name] ||
-                                (repo.topics && repo.topics.includes('executable'));
+            updateStats(cached.repos, cached.user);
 
-            let releaseInfo = null;
-            if (isExecutable) {
-                try {
-                    const releaseRes = await fetch(`https://api.github.com/repos/${CONFIG.GITHUB_USERNAME}/${repo.name}/releases/latest`);
-                    if (releaseRes.ok) releaseInfo = await releaseRes.json();
-                } catch (e) {
-                    // No releases
-                }
+            // Initial render
+            filterAndRenderProjects();
+
+            // Render chart if we have language data
+            if (state.languageData.length > 0) {
+                renderLanguageChart();
             }
 
-            return {
-                id: repo.id,
-                name: repo.name,
-                description: repo.description || 'No description provided.',
-                language: repo.language || 'Other',
-                stars: repo.stargazers_count,
-                forks: repo.forks_count,
-                updated: new Date(repo.updated_at),
-                created: new Date(repo.created_at),
-                url: repo.html_url,
-                hasPages: repo.has_pages,
-                topics: repo.topics || [],
-                isExecutable,
-                releaseInfo,
-                liveDemo: repo.has_pages ? `https://${CONFIG.GITHUB_USERNAME}.github.io/${repo.name}/` : null
-            };
-        }));
+            // Still try to fetch fresh data in background
+            setTimeout(() => fetchFreshGitHubData(cacheKey), 1000);
+            return;
+        }
 
-        // Update stats
-        updateStats(repos, user);
-
-        // Initial render
-        sortProjects();
-        filterAndRenderProjects();
-
-        // Fetch language data for chart
-        fetchLanguageData();
+        // No cache, fetch fresh data
+        await fetchFreshGitHubData(cacheKey);
 
     } catch (error) {
-        console.error('Error fetching GitHub data:', error);
-        showToast('Error loading GitHub data', 'error');
-        elements.projectsContainer.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Unable to load projects</h3>
-                <p>Please try again later</p>
-            </div>
-        `;
+        console.error('Error in fetchGitHubData:', error);
+        showToast('Using cached data - GitHub API rate limit may be exceeded', 'warning');
+
+        // Try to show cached data even if fresh fetch fails
+        const cacheKey = `github_data_${CONFIG.GITHUB_USERNAME}`;
+        const cached = getCachedData(cacheKey, 60 * 24); // Allow 24h old cache in error case
+
+        if (cached && cached.projects) {
+            state.projects = cached.projects;
+            state.languageData = cached.languageData || [];
+            filterAndRenderProjects();
+            if (state.languageData.length > 0) {
+                renderLanguageChart();
+            }
+        } else {
+            showToast('Unable to load projects. Please try again later.', 'error');
+            elements.projectsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Unable to load projects</h3>
+                    <p>GitHub API rate limit exceeded. Please try again in an hour.</p>
+                </div>
+            `;
+        }
     }
 }
 
-function updateStats(repos, user) {
-    // Update hero stats
-    elements.totalRepos.textContent = repos.length;
+// Add this new function to handle fresh GitHub data fetching:
+async function fetchFreshGitHubData(cacheKey) {
+    const [repos, user] = await Promise.all([
+        fetch(`https://api.github.com/users/${CONFIG.GITHUB_USERNAME}/repos?per_page=100`).then(r => r.json()),
+        fetch(`https://api.github.com/users/${CONFIG.GITHUB_USERNAME}`).then(r => r.json())
+    ]);
 
+    if (!Array.isArray(repos)) {
+        if (repos.message && repos.message.includes('rate limit')) {
+            throw new Error('GitHub API rate limit exceeded');
+        }
+        throw new Error(repos.message || 'Invalid GitHub API response');
+    }
+
+    // Process repositories
+    state.projects = await Promise.all(repos.map(async repo => {
+        const isExecutable = CONFIG.EXECUTABLE_PROJECTS[repo.name] ||
+                            (repo.topics && repo.topics.includes('executable'));
+
+        let releaseInfo = null;
+        if (isExecutable) {
+            try {
+                const releaseRes = await fetch(`https://api.github.com/repos/${CONFIG.GITHUB_USERNAME}/${repo.name}/releases/latest`);
+                if (releaseRes.ok) releaseInfo = await releaseRes.json();
+            } catch (e) {
+                // No releases
+            }
+        }
+
+        return {
+            id: repo.id,
+            name: repo.name,
+            description: repo.description || 'No description provided.',
+            language: repo.language || 'Other',
+            stars: repo.stargazers_count,
+            forks: repo.forks_count,
+            updated: new Date(repo.updated_at),
+            created: new Date(repo.created_at),
+            url: repo.html_url,
+            hasPages: repo.has_pages,
+            topics: repo.topics || [],
+            isExecutable,
+            releaseInfo,
+            liveDemo: repo.has_pages ? `https://${CONFIG.GITHUB_USERNAME}.github.io/${repo.name}/` : null,
+            languages_url: repo.languages_url
+        };
+    }));
+
+    // Update stats
+    updateStats(repos, user);
+
+    // Calculate language distribution
+    await calculateLanguageDistribution();
+
+    // Cache the results
+    setCachedData(cacheKey, {
+        repos: repos,
+        user: user,
+        projects: state.projects,
+        languageData: state.languageData
+    });
+
+    // Initial render
+    filterAndRenderProjects();
+}
+
+// Calculate language distribution from all repositories
+async function calculateLanguageDistribution() {
+    const languageMap = {};
+    let totalBytes = 0;
+
+    // Fetch language data for each repository (limit to first 10 to avoid rate limits)
+    const reposToCheck = state.projects.slice(0, 10); // Check only first 10 repos
+
+    for (const project of reposToCheck) {
+        if (project.languages_url) {
+            try {
+                const response = await fetch(project.languages_url);
+                if (response.ok) {
+                    const languages = await response.json();
+
+                    // Sum up language bytes
+                    Object.entries(languages).forEach(([lang, bytes]) => {
+                        languageMap[lang] = (languageMap[lang] || 0) + bytes;
+                        totalBytes += bytes;
+                    });
+                }
+            } catch (error) {
+                console.log(`Failed to fetch languages for ${project.name}:`, error);
+                // Continue with other repos
+            }
+        }
+    }
+
+    // If no language data, use project.language field as fallback
+    if (Object.keys(languageMap).length === 0) {
+        state.projects.forEach(project => {
+            if (project.language && project.language !== 'Other') {
+                languageMap[project.language] = (languageMap[project.language] || 0) + 1;
+                totalBytes += 1;
+            }
+        });
+    }
+
+    // Convert to percentages and sort
+    state.languageData = Object.entries(languageMap)
+        .map(([lang, bytes]) => ({
+            language: lang,
+            percentage: totalBytes > 0 ? Math.round((bytes / totalBytes) * 100) : 0,
+            bytes: bytes
+        }))
+        .sort((a, b) => b.bytes - a.bytes)
+        .slice(0, 6); // Top 6 languages
+
+    // Add "Other" category if we have data
+    if (totalBytes > 0 && state.languageData.length > 0) {
+        const topLanguagesBytes = state.languageData.reduce((sum, lang) => sum + lang.bytes, 0);
+        const otherBytes = totalBytes - topLanguagesBytes;
+        if (otherBytes > 0 && state.languageData.length >= 6) {
+            // Replace the last item with "Other" if we have 6 languages already
+            state.languageData[5] = {
+                language: 'Other',
+                percentage: Math.round((otherBytes / totalBytes) * 100),
+                bytes: otherBytes
+            };
+        }
+    }
+
+    // Render the chart
+    renderLanguageChart();
+}
+
+
+function updateStats(repos, user) {
+    // Update hero stats with animation
+    animateCounter(elements.totalRepos, 0, repos.length, 1000);
+    
     const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
     const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
 
-    elements.totalStars.textContent = totalStars;
-    elements.totalForks.textContent = totalForks;
+    animateCounter(elements.totalStars, 0, totalStars, 1000);
+    animateCounter(elements.totalForks, 0, totalForks, 1000);
 
-    // Update GitHub stats
+    // Update GitHub stats - handle missing data
     elements.githubRepos.textContent = user.public_repos || 0;
-    elements.githubStars.textContent = totalStars;
+    elements.githubStars.textContent = totalStars || 0;
     elements.githubFollowers.textContent = user.followers || 0;
 }
 
+function animateCounter(element, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = Math.floor(progress * (end - start) + start);
+        element.textContent = value.toLocaleString();
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
 // Project Filtering & Sorting
-function sortProjects() {
-    state.projects.sort((a, b) => {
+function sortProjects(projects) {
+    return [...projects].sort((a, b) => {
         switch (state.sortBy) {
             case 'stars':
                 return b.stars - a.stars;
@@ -331,7 +551,7 @@ function sortProjects() {
                 return b.created - a.created;
             case 'name':
                 return a.name.localeCompare(b.name);
-            default: // updated
+            default: // 'updated'
                 return b.updated - a.updated;
         }
     });
@@ -360,9 +580,10 @@ function filterAndRenderProjects() {
                     return project.language === 'JavaScript' || project.language === 'TypeScript';
                 case 'web':
                     return project.topics.includes('web') || project.hasPages ||
-                           ['HTML', 'CSS', 'JavaScript'].includes(project.language);
+                           ['HTML', 'CSS', 'JavaScript', 'TypeScript'].includes(project.language);
                 case 'android':
-                    return project.language === 'Java' || project.topics.includes('android');
+                    return project.language === 'Java' || project.topics.includes('android') || 
+                           project.topics.includes('kotlin') || project.language === 'Kotlin';
                 case 'executable':
                     return project.isExecutable;
                 default:
@@ -371,10 +592,14 @@ function filterAndRenderProjects() {
         });
     }
 
-    state.filteredProjects = filtered;
+    // Apply sorting
+    state.filteredProjects = sortProjects(filtered);
+    
+    // Render
     renderProjects();
 }
 
+// Mobile-friendly project card rendering
 function renderProjects() {
     if (state.projects.length === 0) {
         elements.projectsContainer.innerHTML = `
@@ -400,7 +625,10 @@ function renderProjects() {
     elements.emptyState.style.display = 'none';
 
     // Render projects
-    elements.projectsContainer.innerHTML = pageProjects.map((project, index) => `
+    elements.projectsContainer.innerHTML = pageProjects.map((project, index) => {
+        const isMobile = state.isMobile;
+        
+        return `
         <div class="project-card" style="animation-delay: ${index * 0.1}s" data-id="${project.id}">
             <div class="project-header">
                 <div class="project-title">
@@ -413,39 +641,87 @@ function renderProjects() {
                 </div>
             </div>
             <div class="project-body">
-                <p class="project-description">${project.description}</p>
-                <div class="project-meta">
-                    <span><i class="fas fa-code"></i> ${project.language}</span>
-                    <span><i class="far fa-clock"></i> ${formatDate(project.updated)}</span>
-                </div>
-                ${project.topics.length > 0 ? `
-                    <div class="project-tags">
-                        ${project.topics.slice(0, 3).map(topic =>
-                            `<span class="project-tag">${topic}</span>`
-                        ).join('')}
+                ${!isMobile ? `
+                    <p class="project-description">${project.description}</p>
+                    <div class="project-meta">
+                        <span><i class="fas fa-code"></i> ${project.language}</span>
+                        <span><i class="far fa-clock"></i> ${formatDate(project.updated)}</span>
                     </div>
-                ` : ''}
+                    ${project.topics.length > 0 ? `
+                        <div class="project-tags">
+                            ${project.topics.slice(0, 4).map(topic =>
+                                `<span class="project-tag">${topic}</span>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                ` : `
+                    <div class="mobile-project-info">
+                        <div class="project-meta">
+                            <span><i class="fas fa-code"></i> ${project.language}</span>
+                            <span><i class="far fa-clock"></i> ${formatDate(project.updated)}</span>
+                        </div>
+                        <button class="toggle-description" data-id="${project.id}">
+                            <i class="fas fa-chevron-down"></i>
+                            <span>View Description</span>
+                        </button>
+                        <div class="mobile-description" id="desc-${project.id}" style="display: none;">
+                            <p class="project-description">${project.description}</p>
+                            ${project.topics.length > 0 ? `
+                                <div class="project-tags">
+                                    ${project.topics.slice(0, 3).map(topic =>
+                                        `<span class="project-tag">${topic}</span>`
+                                    ).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `}
             </div>
             <div class="project-footer">
                 <a href="${project.url}" target="_blank" class="project-btn code">
                     <i class="fab fa-github"></i>
-                    <span>Code</span>
+                    <span>${isMobile ? 'Code' : 'View Code'}</span>
                 </a>
-                ${getProjectButtons(project)}
+                ${getProjectButtons(project, isMobile)}
             </div>
         </div>
-    `).join('');
+    `}).join('');
 
-    // Add click event for modal
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('.project-btn')) {
-                const projectId = card.dataset.id;
-                const project = state.projects.find(p => p.id == projectId);
-                showProjectModal(project);
-            }
+    // Add click event for modal (non-mobile)
+    if (!state.isMobile) {
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.project-btn') && !e.target.closest('.toggle-description')) {
+                    const projectId = card.dataset.id;
+                    const project = state.projects.find(p => p.id == projectId);
+                    showProjectModal(project);
+                }
+            });
         });
-    });
+    }
+
+    // Add toggle events for mobile descriptions
+    if (state.isMobile) {
+        document.querySelectorAll('.toggle-description').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const projectId = btn.dataset.id;
+                const desc = document.getElementById(`desc-${projectId}`);
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                
+                if (desc.style.display === 'block') {
+                    desc.style.display = 'none';
+                    icon.className = 'fas fa-chevron-down';
+                    text.textContent = 'View Description';
+                } else {
+                    desc.style.display = 'block';
+                    icon.className = 'fas fa-chevron-up';
+                    text.textContent = 'Hide Description';
+                }
+            });
+        });
+    }
 
     // Update pagination
     updatePagination();
@@ -460,19 +736,22 @@ function getProjectIcon(project) {
         case 'typescript': return 'fab fa-js';
         case 'html': return 'fab fa-html5';
         case 'css': return 'fab fa-css3-alt';
-        case 'java': return 'fab fa-android';
+        case 'java': return 'fab fa-java';
+        case 'kotlin': return 'fab fa-android';
         case 'swift': return 'fab fa-swift';
         case 'php': return 'fab fa-php';
+        case 'c#': return 'fas fa-code';
+        case 'c++': return 'fas fa-code';
         default: return 'fas fa-code';
     }
 }
 
-function getProjectButtons(project) {
+function getProjectButtons(project, isMobile = false) {
     let buttons = '';
 
     if (project.isExecutable && project.releaseInfo) {
         const downloadUrl = project.releaseInfo.assets?.[0]?.browser_download_url || project.releaseInfo.html_url;
-        const downloadText = project.releaseInfo.assets?.length ? 'Download' : 'View Release';
+        const downloadText = isMobile ? 'Download' : (project.releaseInfo.assets?.length ? 'Download' : 'View Release');
         buttons += `
             <a href="${downloadUrl}" target="_blank" class="project-btn download">
                 <i class="fas fa-download"></i>
@@ -483,7 +762,7 @@ function getProjectButtons(project) {
         buttons += `
             <a href="${project.liveDemo}" target="_blank" class="project-btn demo">
                 <i class="fas fa-external-link-alt"></i>
-                <span>Demo</span>
+                <span>${isMobile ? 'Demo' : 'Live Demo'}</span>
             </a>
         `;
     }
@@ -505,13 +784,32 @@ function updatePagination() {
 
     // Generate page numbers
     let pagesHtml = '';
-    for (let i = 1; i <= totalPages; i++) {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, state.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+        pagesHtml += `<button class="page-number" data-page="1">1</button>`;
+        if (startPage > 2) pagesHtml += `<span class="page-dots">...</span>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
         pagesHtml += `
             <button class="page-number ${i === state.currentPage ? 'active' : ''}" data-page="${i}">
                 ${i}
             </button>
         `;
     }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pagesHtml += `<span class="page-dots">...</span>`;
+        pagesHtml += `<button class="page-number" data-page="${totalPages}">${totalPages}</button>`;
+    }
+
     elements.pageNumbers.innerHTML = pagesHtml;
 
     // Add click events to page numbers
@@ -580,86 +878,115 @@ function showProjectModal(project) {
     elements.modalOverlay.classList.add('active');
 }
 
-// Language Chart
-async function fetchLanguageData() {
-    try {
-        const response = await fetch(`https://api.github.com/users/${CONFIG.GITHUB_USERNAME}/repos`);
-        const repos = await response.json();
-
-        const languages = {};
-        let totalBytes = 0;
-
-        for (const repo of repos) {
-            if (repo.fork) continue;
-
-            try {
-                const langRes = await fetch(repo.languages_url);
-                const langData = await langRes.json();
-
-                for (const [lang, bytes] of Object.entries(langData)) {
-                    languages[lang] = (languages[lang] || 0) + bytes;
-                    totalBytes += bytes;
-                }
-            } catch (error) {
-                continue;
-            }
+// Language Chart with actual GitHub data
+function renderLanguageChart() {
+    const ctx = document.getElementById('languageChart');
+    if (!ctx || state.languageData.length === 0) {
+        // Show message if no language data
+        const chartContainer = document.querySelector('.language-chart');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No language data available</p>';
         }
-
-        const sortedLanguages = Object.entries(languages)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 5)
-            .map(([lang, bytes]) => ({
-                language: lang,
-                percentage: ((bytes / totalBytes) * 100).toFixed(1)
-            }));
-
-        renderLanguageChart(sortedLanguages);
-
-    } catch (error) {
-        console.error('Error fetching language data:', error);
+        return;
     }
-}
-
-function renderLanguageChart(languages) {
-    const ctx = document.getElementById('languageChart').getContext('2d');
+    
+    const chartContext = ctx.getContext('2d');
     const isDark = elements.body.classList.contains('dark-mode');
 
-    const colors = isDark
-        ? ['#0a84ff', '#5e5ce6', '#64d2ff', '#30d158', '#ff9f0a']
-        : ['#007aff', '#5856d6', '#5ac8fa', '#34c759', '#ff9500'];
+    // Prepare data
+    const labels = state.languageData.map(l => l.language);
+    const data = state.languageData.map(l => l.percentage);
 
-    if (window.languageChart) {
-        window.languageChart.destroy();
+    // Colors for different languages
+    const languageColors = {
+        'Python': '#3572A5',
+        'JavaScript': '#F7DF1E',
+        'TypeScript': '#3178C6',
+        'HTML': '#E34C26',
+        'CSS': '#563D7C',
+        'Java': '#007396',
+        'Kotlin': '#A97BFF',
+        'Shell': '#89E051',
+        'C++': '#00599C',
+        'C#': '#239120',
+        'PHP': '#777BB4',
+        'Ruby': '#CC342D',
+        'Go': '#00ADD8',
+        'Rust': '#DEA584',
+        'Swift': '#F05138',
+        'Dart': '#00B4AB',
+        'Other': isDark ? '#6C757D' : '#ADB5BD'
+    };
+
+    const backgroundColor = labels.map(label => 
+        languageColors[label] || (isDark ? '#6C757D' : '#ADB5BD')
+    );
+
+    // Destroy existing chart properly
+    if (languageChart && typeof languageChart.destroy === 'function') {
+        try {
+            languageChart.destroy();
+        } catch (error) {
+            console.log('Error destroying chart:', error);
+        }
+        languageChart = null;
     }
 
-    window.languageChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: languages.map(l => l.language),
-            datasets: [{
-                data: languages.map(l => parseFloat(l.percentage)),
-                backgroundColor: colors,
-                borderWidth: 0,
-                hoverOffset: 15
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: (context) => `${context.label}: ${context.parsed}%`
+    try {
+        languageChart = new Chart(chartContext, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderWidth: 1,
+                    borderColor: isDark ? '#2c2c2e' : '#ffffff',
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: isDark ? '#f5f5f7' : '#1d1d1f',
+                            font: {
+                                size: 11
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return `${label}: ${value}%`;
+                            }
+                        }
                     }
+                },
+                cutout: '65%',
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
                 }
             }
+        });
+    } catch (error) {
+        console.error('Error creating chart:', error);
+        const chartContainer = document.querySelector('.language-chart');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">Chart could not be loaded</p>';
         }
-    });
+    }
 }
+
 
 // Publications
 async function fetchPublications() {
@@ -819,3 +1146,7 @@ function updateVisitorCounter() {
     // Update last updated time
     elements.lastUpdated.textContent = formatDate(new Date(), true);
 }
+
+// Export for debugging
+window.state = state;
+window.elements = elements;
