@@ -655,50 +655,63 @@ function renderProjects() {
                         </div>
                     ` : ''}
                 ` : `
-                    <div class="mobile-project-info">
-                        <div class="project-meta">
-                            <span><i class="fas fa-code"></i> ${project.language}</span>
-                            <span><i class="far fa-clock"></i> ${formatDate(project.updated)}</span>
-                        </div>
-                        <button class="toggle-description" data-id="${project.id}">
-                            <i class="fas fa-chevron-down"></i>
-                            <span>View Description</span>
-                        </button>
-                        <div class="mobile-description" id="desc-${project.id}" style="display: none;">
-                            <p class="project-description">${project.description}</p>
-                            ${project.topics.length > 0 ? `
-                                <div class="project-tags">
-                                    ${project.topics.slice(0, 3).map(topic =>
-                                        `<span class="project-tag">${topic}</span>`
-                                    ).join('')}
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `}
-            </div>
-            <div class="project-footer">
-                <a href="${project.url}" target="_blank" class="project-btn code">
-                    <i class="fab fa-github"></i>
-                    <span>${isMobile ? 'Code' : 'View Code'}</span>
-                </a>
-                ${getProjectButtons(project, isMobile)}
-            </div>
+    <div class="mobile-project-info">
+        <div class="project-meta">
+            <span><i class="fas fa-code"></i> ${project.language}</span>
+            <span><i class="far fa-clock"></i> ${formatDate(project.updated)}</span>
+            <button class="description-toggle" data-id="${project.id}">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="mobile-description" id="desc-${project.id}" style="display: none;">
+            <p class="project-description">${project.description}</p>
+            ${project.topics.length > 0 ? `
+                <div class="project-tags">
+                    ${project.topics.slice(0, 3).map(topic =>
+                        `<span class="project-tag">${topic}</span>`
+                    ).join('')}
+                </div>
+            ` : ''}
+        </div>
+    </div>
+`}
+</div>
+<div class="project-footer">
+    <a href="${project.url}" target="_blank" class="project-btn code">
+        <i class="fab fa-github"></i>
+        <span>Code</span>
+    </a>
+    ${getProjectButtons(project, true)}
+</div>
         </div>
     `}).join('');
 
     // Add click event for modal (non-mobile)
-    if (!state.isMobile) {
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (!e.target.closest('.project-btn') && !e.target.closest('.toggle-description')) {
-                    const projectId = card.dataset.id;
-                    const project = state.projects.find(p => p.id == projectId);
-                    showProjectModal(project);
-                }
-            });
+    // Add toggle events for mobile descriptions
+if (state.isMobile) {
+    document.querySelectorAll('.description-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const projectId = btn.dataset.id;
+            const desc = document.getElementById(`desc-${projectId}`);
+            const icon = btn.querySelector('i');
+
+            if (desc.style.display === 'block') {
+                desc.style.animation = 'slideUp 0.3s ease forwards';
+                setTimeout(() => {
+                    desc.style.display = 'none';
+                    btn.classList.remove('expanded');
+                }, 250);
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                desc.style.display = 'block';
+                desc.style.animation = 'slideDown 0.3s ease forwards';
+                btn.classList.add('expanded');
+                icon.className = 'fas fa-chevron-up';
+            }
         });
-    }
+    });
+}
 
     // Add toggle events for mobile descriptions
     if (state.isMobile) {
@@ -749,22 +762,43 @@ function getProjectIcon(project) {
 function getProjectButtons(project, isMobile = false) {
     let buttons = '';
 
-    if (project.isExecutable && project.releaseInfo) {
-        const downloadUrl = project.releaseInfo.assets?.[0]?.browser_download_url || project.releaseInfo.html_url;
-        const downloadText = isMobile ? 'Download' : (project.releaseInfo.assets?.length ? 'Download' : 'View Release');
-        buttons += `
-            <a href="${downloadUrl}" target="_blank" class="project-btn download">
-                <i class="fas fa-download"></i>
-                <span>${downloadText}</span>
-            </a>
-        `;
-    } else if (project.liveDemo) {
-        buttons += `
-            <a href="${project.liveDemo}" target="_blank" class="project-btn demo">
-                <i class="fas fa-external-link-alt"></i>
-                <span>${isMobile ? 'Demo' : 'Live Demo'}</span>
-            </a>
-        `;
+    if (isMobile) {
+        // Compact buttons for mobile
+        if (project.isExecutable && project.releaseInfo) {
+            const downloadUrl = project.releaseInfo.assets?.[0]?.browser_download_url || project.releaseInfo.html_url;
+            buttons += `
+                <a href="${downloadUrl}" target="_blank" class="project-btn download">
+                    <i class="fas fa-download"></i>
+                    <span>DL</span>
+                </a>
+            `;
+        } else if (project.liveDemo) {
+            buttons += `
+                <a href="${project.liveDemo}" target="_blank" class="project-btn demo">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Demo</span>
+                </a>
+            `;
+        }
+    } else {
+        // Original desktop buttons
+        if (project.isExecutable && project.releaseInfo) {
+            const downloadUrl = project.releaseInfo.assets?.[0]?.browser_download_url || project.releaseInfo.html_url;
+            const downloadText = project.releaseInfo.assets?.length ? 'Download' : 'View Release';
+            buttons += `
+                <a href="${downloadUrl}" target="_blank" class="project-btn download">
+                    <i class="fas fa-download"></i>
+                    <span>${downloadText}</span>
+                </a>
+            `;
+        } else if (project.liveDemo) {
+            buttons += `
+                <a href="${project.liveDemo}" target="_blank" class="project-btn demo">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Live Demo</span>
+                </a>
+            `;
+        }
     }
 
     return buttons;

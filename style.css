@@ -1799,6 +1799,318 @@ body {
         transform: translateY(-2px);
     }
 }
+
+
+/* Add this to the existing style.css file */
+
+/* ===== Mobile Optimizations ===== */
+@media (max-width: 768px) {
+    /* Hide terminal on mobile */
+    .code-window {
+        display: none;
+    }
+
+    /* Adjust hero layout for mobile */
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .hero-visual {
+        order: -1; /* Move terminal to top if you want to keep it but hidden */
+    }
+
+    /* Mobile project card improvements */
+    .project-card {
+        padding: 0.75rem;
+    }
+
+    .project-header {
+        padding: 0.75rem 0.5rem;
+        align-items: center;
+        position: relative;
+    }
+
+    .project-title {
+        flex: 1;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .project-title h3 {
+        font-size: 1rem;
+        margin-right: auto;
+        flex: 1;
+    }
+
+    /* Compact dropdown arrow for description */
+    .description-toggle {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0.25rem;
+        margin-left: 0.5rem;
+        transition: transform var(--transition-fast);
+        min-width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+    }
+
+    .description-toggle:hover {
+        background: var(--bg-tertiary);
+    }
+
+    .description-toggle.expanded i {
+        transform: rotate(180deg);
+    }
+
+    .description-toggle i {
+        font-size: 0.875rem;
+        transition: transform var(--transition-fast);
+    }
+
+    /* Project meta in compact row */
+    .project-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    /* Compact description area */
+    .mobile-description {
+        padding: 0.5rem 0;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        line-height: 1.4;
+        color: var(--text-secondary);
+        animation: slideDown 0.3s ease;
+    }
+
+    /* Compact tags */
+    .project-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin: 0.5rem 0;
+    }
+
+    .project-tag {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.35rem;
+    }
+
+    /* Compact buttons side by side */
+    .project-footer {
+        padding: 0.5rem 0;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .project-btn {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+    }
+
+    .project-btn span {
+        font-size: 0.75rem;
+    }
+
+    .project-btn i {
+        font-size: 0.875rem;
+    }
+
+    /* Adjust stars position */
+    .project-stars {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-sm);
+    }
+
+    /* Make filter tags scrollable */
+    .filter-tags {
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-tags::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .filter-tag {
+        white-space: nowrap;
+        font-size: 0.8rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    /* Adjust hero title */
+    .hero-title {
+        font-size: 2.25rem;
+        line-height: 1.1;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    /* Compact stats */
+    .hero-stats {
+        gap: 1.5rem;
+        justify-content: space-between;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    /* Adjust section headers */
+    .section-header h2 {
+        font-size: 2rem;
+    }
+
+    .section-header p {
+        font-size: 1rem;
+    }
+
+    /* Make skills section more compact */
+    .skills-category {
+        padding: 1rem;
+    }
+
+    .skill-bars {
+        gap: 0.75rem;
+    }
+
+    .tech-tag {
+        font-size: 0.8rem;
+        padding: 0.375rem 0.5rem;
+    }
+
+    /* Adjust footer for mobile */
+    .footer-content {
+        gap: 1.5rem;
+    }
+
+    .footer-brand {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .footer-links {
+        text-align: center;
+    }
+
+    .social-links {
+        align-items: center;
+    }
+
+    .footer-stats {
+        align-items: center;
+    }
+}
+
+/* Smaller mobile devices */
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.875rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.875rem;
+    }
+
+    .projects-grid {
+        gap: 1rem;
+    }
+
+    .filter-container {
+        padding: 1rem;
+    }
+
+    .search-input {
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        font-size: 0.875rem;
+    }
+
+    .search-wrapper i {
+        left: 0.75rem;
+    }
+}
+
+/* Hide the old toggle description button */
+@media (max-width: 768px) {
+    .toggle-description {
+        display: none;
+    }
+}
+
+/* Animation for description toggle */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        max-height: 500px;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-5px);
+    }
+}
+
+
+/* Complete mobile terminal hide */
+@media (max-width: 768px) {
+    .hero-visual {
+        display: none;
+    }
+
+    .hero-text {
+        text-align: center;
+        align-items: center;
+    }
+
+    .hero-stats {
+        justify-content: center;
+        gap: 2rem;
+    }
+}
 /* ===== Responsive Design ===== */
 @media (max-width: 768px) {
     .header-container {
