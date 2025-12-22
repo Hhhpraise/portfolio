@@ -758,6 +758,32 @@ function renderProjects() {
         });
     });
 
+    // Hide toggle buttons for descriptions that don't exceed 3 lines
+    document.querySelectorAll('.description-toggle').forEach(btn => {
+        const projectId = btn.dataset.id;
+        const description = document.querySelector(`.project-description[data-id="${projectId}"]`);
+
+        if (description) {
+            // Check if content is truncated (scrollHeight > offsetHeight means it's truncated)
+            if (description.scrollHeight <= description.offsetHeight) {
+                // Content fits in 3 lines, hide the toggle button
+                btn.style.display = 'none';
+            } else {
+                // Content is truncated, show the toggle button
+                btn.style.display = 'inline-flex';
+            }
+        }
+    });
+
+    // Add event listeners for preview demo buttons (desktop only)
+    document.querySelectorAll('.preview-demo-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const demoUrl = btn.dataset.demoUrl;
+            const projectName = btn.dataset.projectName;
+            showPreviewModal(demoUrl, projectName);
+        });
+    });
 
     // Update pagination
     updatePagination();
