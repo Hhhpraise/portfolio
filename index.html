@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Praise - Software Developer specializing in Python, JavaScript, Android, and Web Development. Clean, fast portfolio showcasing GitHub projects and skills.">
-    <meta name="keywords" content="software developer, python developer, javascript developer, android developer, web developer, github portfolio">
+    <meta name="description"
+        content="Praise - Software Developer specializing in Python, JavaScript, Android, and Web Development. Clean, fast portfolio showcasing GitHub projects and skills.">
+    <meta name="keywords"
+        content="software developer, python developer, javascript developer, android developer, web developer, github portfolio">
     <meta name="author" content="Praise (hhhpraise)">
     <meta name="robots" content="index, follow">
 
@@ -12,7 +15,8 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://hhhpraise.github.io/portfolio/">
     <meta property="og:title" content="Praise | Software Developer">
-    <meta property="og:description" content="Clean, fast portfolio showcasing Python, JavaScript, Android, and Web development projects.">
+    <meta property="og:description"
+        content="Clean, fast portfolio showcasing Python, JavaScript, Android, and Web development projects.">
     <meta property="og:image" content="https://github.com/Hhhpraise.png">
 
     <!-- Apple PWA -->
@@ -51,6 +55,7 @@
     }
     </script>
 </head>
+
 <body>
     <!-- Animated Background -->
     <div class="liquid-background"></div>
@@ -200,10 +205,7 @@ class Portfolio:
             <div class="filter-container glass-panel">
                 <div class="search-wrapper">
                     <i class="fas fa-search"></i>
-                    <input type="text"
-                           id="project-search"
-                           placeholder="Search projects..."
-                           class="search-input">
+                    <input type="text" id="project-search" placeholder="Search projects..." class="search-input">
                     <button id="clear-search" class="clear-search" aria-label="Clear search">
                         <i class="fas fa-times"></i>
                     </button>
@@ -479,6 +481,35 @@ class Portfolio:
         </div>
     </div>
 
+    <!-- Live Preview Modal -->
+    <div class="preview-modal-overlay" id="preview-modal-overlay">
+        <div class="preview-modal-content">
+            <div class="preview-modal-header">
+                <div class="preview-modal-title">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span id="preview-title">Live Preview</span>
+                </div>
+                <div class="preview-modal-actions">
+                    <a href="#" target="_blank" class="preview-open-btn" id="preview-open-btn" title="Open in new tab">
+                        <i class="fas fa-arrow-up-right-from-square"></i>
+                        <span>Open</span>
+                    </a>
+                    <button class="preview-close-btn" id="preview-close-btn" title="Close preview">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-modal-body">
+                <div class="preview-loading" id="preview-loading">
+                    <div class="spinner"></div>
+                    <p>Loading preview...</p>
+                </div>
+                <iframe id="preview-iframe" class="preview-iframe"
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Back to Top -->
     <button class="back-to-top" id="back-to-top">
         <i class="fas fa-arrow-up"></i>
@@ -491,4 +522,5 @@ class Portfolio:
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>

@@ -45,6 +45,12 @@ const elements = {
     modalOverlay: document.querySelector('#modal-overlay'),
     modalClose: document.querySelector('#modal-close'),
     modalBody: document.querySelector('#modal-body'),
+    previewModalOverlay: document.querySelector('#preview-modal-overlay'),
+    previewCloseBtn: document.querySelector('#preview-close-btn'),
+    previewOpenBtn: document.querySelector('#preview-open-btn'),
+    previewTitle: document.querySelector('#preview-title'),
+    previewIframe: document.querySelector('#preview-iframe'),
+    previewLoading: document.querySelector('#preview-loading'),
     backToTop: document.querySelector('#back-to-top'),
     toastContainer: document.querySelector('#toast-container'),
     visitorCount: document.querySelector('#visitor-count'),
@@ -116,7 +122,7 @@ function checkMobile() {
 // Update logos with GitHub avatar
 function updateLogos() {
     const avatarUrl = `https://github.com/${CONFIG.GITHUB_USERNAME}.png`;
-    
+
     // Header logo
     if (elements.logoIcon) {
         elements.logoIcon.innerHTML = '';
@@ -129,7 +135,7 @@ function updateLogos() {
         img.style.objectFit = 'cover';
         elements.logoIcon.appendChild(img);
     }
-    
+
     // Footer logo
     if (elements.footerLogo) {
         elements.footerLogo.innerHTML = '';
@@ -295,6 +301,24 @@ function initEventListeners() {
         }
     });
 
+    // Preview Modal
+    elements.previewCloseBtn.addEventListener('click', () => {
+        closePreviewModal();
+    });
+
+    elements.previewModalOverlay.addEventListener('click', (e) => {
+        if (e.target === elements.previewModalOverlay) {
+            closePreviewModal();
+        }
+    });
+
+    // Close preview modal on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && elements.previewModalOverlay.classList.contains('active')) {
+            closePreviewModal();
+        }
+    });
+
     // Back to top
     window.addEventListener('scroll', () => {
         if (window.scrollY > 300) {
@@ -395,7 +419,7 @@ async function fetchFreshGitHubData(cacheKey) {
     // Process repositories
     state.projects = await Promise.all(repos.map(async repo => {
         const isExecutable = CONFIG.EXECUTABLE_PROJECTS[repo.name] ||
-                            (repo.topics && repo.topics.includes('executable'));
+            (repo.topics && repo.topics.includes('executable'));
 
         let releaseInfo = null;
         if (isExecutable) {
@@ -514,7 +538,7 @@ async function calculateLanguageDistribution() {
 function updateStats(repos, user) {
     // Update hero stats with animation
     animateCounter(elements.totalRepos, 0, repos.length, 1000);
-    
+
     const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
     const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
 
@@ -580,10 +604,10 @@ function filterAndRenderProjects() {
                     return project.language === 'JavaScript' || project.language === 'TypeScript';
                 case 'web':
                     return project.topics.includes('web') || project.hasPages ||
-                           ['HTML', 'CSS', 'JavaScript', 'TypeScript'].includes(project.language);
+                        ['HTML', 'CSS', 'JavaScript', 'TypeScript'].includes(project.language);
                 case 'android':
-                    return project.language === 'Java' || project.topics.includes('android') || 
-                           project.topics.includes('kotlin') || project.language === 'Kotlin';
+                    return project.language === 'Java' || project.topics.includes('android') ||
+                        project.topics.includes('kotlin') || project.language === 'Kotlin';
                 case 'executable':
                     return project.isExecutable;
                 default:
@@ -594,7 +618,7 @@ function filterAndRenderProjects() {
 
     // Apply sorting
     state.filteredProjects = sortProjects(filtered);
-    
+
     // Render
     renderProjects();
 }
@@ -627,7 +651,7 @@ function renderProjects() {
     // Render projects
     elements.projectsContainer.innerHTML = pageProjects.map((project, index) => {
         const isMobile = state.isMobile;
-        
+
         return `
         <div class="project-card" style="animation-delay: ${index * 0.1}s" data-id="${project.id}">
             <div class="project-header">
@@ -642,7 +666,11 @@ function renderProjects() {
             </div>
             <div class="project-body">
                 ${!isMobile ? `
-                    <p class="project-description">${project.description}</p>
+                    <p class="project-description" data-id="${project.id}">${project.description}</p>
+                    <button class="description-toggle" data-id="${project.id}">
+                        <span>Read more</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
                     <div class="project-meta">
                         <span><i class="fas fa-code"></i> ${project.language}</span>
                         <span><i class="far fa-clock"></i> ${formatDate(project.updated)}</span>
@@ -650,8 +678,8 @@ function renderProjects() {
                     ${project.topics.length > 0 ? `
                         <div class="project-tags">
                             ${project.topics.slice(0, 4).map(topic =>
-                                `<span class="project-tag">${topic}</span>`
-                            ).join('')}
+            `<span class="project-tag">${topic}</span>`
+        ).join('')}
                         </div>
                     ` : ''}
                 ` : `
@@ -668,8 +696,8 @@ function renderProjects() {
             ${project.topics.length > 0 ? `
                 <div class="project-tags">
                     ${project.topics.slice(0, 3).map(topic =>
-                        `<span class="project-tag">${topic}</span>`
-                    ).join('')}
+            `<span class="project-tag">${topic}</span>`
+        ).join('')}
                 </div>
             ` : ''}
         </div>
@@ -687,54 +715,49 @@ function renderProjects() {
     `}).join('');
 
     // Add click event for modal (non-mobile)
-    // Add toggle events for mobile descriptions
-if (state.isMobile) {
+    // Add toggle events for descriptions
     document.querySelectorAll('.description-toggle').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const projectId = btn.dataset.id;
-            const desc = document.getElementById(`desc-${projectId}`);
-            const icon = btn.querySelector('i');
 
-            if (desc.style.display === 'block') {
-                desc.style.animation = 'slideUp 0.3s ease forwards';
-                setTimeout(() => {
-                    desc.style.display = 'none';
-                    btn.classList.remove('expanded');
-                }, 250);
-                icon.className = 'fas fa-chevron-down';
+            if (state.isMobile) {
+                // Mobile behavior - toggle mobile description panel
+                const desc = document.getElementById(`desc-${projectId}`);
+                const icon = btn.querySelector('i');
+
+                if (desc.style.display === 'block') {
+                    desc.style.animation = 'slideUp 0.3s ease forwards';
+                    setTimeout(() => {
+                        desc.style.display = 'none';
+                        btn.classList.remove('expanded');
+                    }, 250);
+                    icon.className = 'fas fa-chevron-down';
+                } else {
+                    desc.style.display = 'block';
+                    desc.style.animation = 'slideDown 0.3s ease forwards';
+                    btn.classList.add('expanded');
+                    icon.className = 'fas fa-chevron-up';
+                }
             } else {
-                desc.style.display = 'block';
-                desc.style.animation = 'slideDown 0.3s ease forwards';
-                btn.classList.add('expanded');
-                icon.className = 'fas fa-chevron-up';
+                // Desktop behavior - expand/collapse description
+                const description = document.querySelector(`.project-description[data-id="${projectId}"]`);
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+
+                if (description.classList.contains('expanded')) {
+                    description.classList.remove('expanded');
+                    btn.classList.remove('expanded');
+                    text.textContent = 'Read more';
+                } else {
+                    description.classList.add('expanded');
+                    btn.classList.add('expanded');
+                    text.textContent = 'Show less';
+                }
             }
         });
     });
-}
 
-    // Add toggle events for mobile descriptions
-    if (state.isMobile) {
-        document.querySelectorAll('.toggle-description').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const projectId = btn.dataset.id;
-                const desc = document.getElementById(`desc-${projectId}`);
-                const icon = btn.querySelector('i');
-                const text = btn.querySelector('span');
-                
-                if (desc.style.display === 'block') {
-                    desc.style.display = 'none';
-                    icon.className = 'fas fa-chevron-down';
-                    text.textContent = 'View Description';
-                } else {
-                    desc.style.display = 'block';
-                    icon.className = 'fas fa-chevron-up';
-                    text.textContent = 'Hide Description';
-                }
-            });
-        });
-    }
 
     // Update pagination
     updatePagination();
@@ -792,11 +815,12 @@ function getProjectButtons(project, isMobile = false) {
                 </a>
             `;
         } else if (project.liveDemo) {
+            // Desktop: Use button to trigger preview modal
             buttons += `
-                <a href="${project.liveDemo}" target="_blank" class="project-btn demo">
+                <button class="project-btn demo preview-demo-btn" data-demo-url="${project.liveDemo}" data-project-name="${project.name}">
                     <i class="fas fa-external-link-alt"></i>
-                    <span>Live Demo</span>
-                </a>
+                    <span>Live Preview</span>
+                </button>
             `;
         }
     }
@@ -912,6 +936,56 @@ function showProjectModal(project) {
     elements.modalOverlay.classList.add('active');
 }
 
+// Live Preview Modal
+function showPreviewModal(url, projectName) {
+    // Set the title
+    elements.previewTitle.textContent = `${projectName} - Live Preview`;
+
+    // Set the "Open" button URL
+    elements.previewOpenBtn.href = url;
+
+    // Show modal
+    elements.previewModalOverlay.classList.add('active');
+
+    // Show loading state
+    elements.previewLoading.classList.remove('hidden');
+    elements.previewIframe.classList.remove('loaded');
+
+    // Load iframe
+    elements.previewIframe.src = url;
+
+    // Handle iframe load
+    const handleLoad = () => {
+        setTimeout(() => {
+            elements.previewLoading.classList.add('hidden');
+            elements.previewIframe.classList.add('loaded');
+        }, 500);
+        elements.previewIframe.removeEventListener('load', handleLoad);
+    };
+
+    elements.previewIframe.addEventListener('load', handleLoad);
+
+    // Handle iframe error (timeout after 10 seconds)
+    setTimeout(() => {
+        if (!elements.previewIframe.classList.contains('loaded')) {
+            elements.previewLoading.querySelector('p').textContent = 'Preview taking longer than expected...';
+        }
+    }, 10000);
+}
+
+function closePreviewModal() {
+    elements.previewModalOverlay.classList.remove('active');
+
+    // Clear iframe after animation
+    setTimeout(() => {
+        elements.previewIframe.src = '';
+        elements.previewIframe.classList.remove('loaded');
+        elements.previewLoading.classList.remove('hidden');
+        elements.previewLoading.querySelector('p').textContent = 'Loading preview...';
+    }, 300);
+}
+
+
 // Language Chart with actual GitHub data
 function renderLanguageChart() {
     const ctx = document.getElementById('languageChart');
@@ -923,7 +997,7 @@ function renderLanguageChart() {
         }
         return;
     }
-    
+
     const chartContext = ctx.getContext('2d');
     const isDark = elements.body.classList.contains('dark-mode');
 
@@ -952,7 +1026,7 @@ function renderLanguageChart() {
         'Other': isDark ? '#6C757D' : '#ADB5BD'
     };
 
-    const backgroundColor = labels.map(label => 
+    const backgroundColor = labels.map(label =>
         languageColors[label] || (isDark ? '#6C757D' : '#ADB5BD')
     );
 
@@ -997,7 +1071,7 @@ function renderLanguageChart() {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const label = context.label || '';
                                 const value = context.parsed || 0;
                                 return `${label}: ${value}%`;
