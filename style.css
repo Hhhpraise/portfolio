@@ -2150,3 +2150,736 @@ body {
         gap: 0.5rem;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   APPEND THIS ENTIRE BLOCK TO THE BOTTOM OF style.css
+   Covers: showcase section, browser frame, slide layout,
+           shimmer loader, nav buttons, dots, progress bar,
+           live preview modal, and full mobile responsive.
+═══════════════════════════════════════════════════════════════════ */
+
+
+/* ─── Featured Showcase: outer wrapper ───────────────────────────── */
+#featured-showcase {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+}
+
+.showcase-wrapper {
+    position: relative;
+}
+
+.showcase-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.showcase-header h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.375rem;
+    letter-spacing: -0.025em;
+}
+
+.showcase-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+
+/* ─── Progress bar ────────────────────────────────────────────────── */
+.sc-progress {
+    height: 2px;
+    background: var(--glass-border);
+    border-radius: 2px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+#sc-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 2px;
+    /* transition is applied dynamically by JS */
+}
+
+
+/* ─── Stage container (arrows + stage) ───────────────────────────── */
+.showcase-stage-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* The stage: fixed height, clips all slides */
+.showcase-stage {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    height: 480px;
+    /* Prevents layout shift during slide transitions */
+    min-height: 480px;
+}
+
+
+/* ─── Individual slides ───────────────────────────────────────────── */
+.showcase-slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glass-shadow);
+
+    /* Hidden by default */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(60px);
+    transition:
+        transform 500ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity   500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Entry from right (next) */
+.showcase-slide.from-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+/* Entry from left (prev), also used as exit for forward navigation */
+.showcase-slide.from-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+/* Active / visible */
+.showcase-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+
+/* ─── Browser frame ───────────────────────────────────────────────── */
+.browser-frame {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    height: 100%;
+}
+
+/* Chrome bar (traffic lights + address bar) */
+.browser-chrome-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.875rem;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--glass-border);
+    flex-shrink: 0;
+}
+
+.bc-dots {
+    display: flex;
+    gap: 0.375rem;
+    flex-shrink: 0;
+}
+
+/* bc-dot r/y/g already defined via the preview modal — shared styles */
+.bc-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.bc-dot.r { background: #ff5f57; }
+.bc-dot.y { background: #febc2e; }
+.bc-dot.g { background: #28c840; }
+
+.bc-address-bar {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    overflow: hidden;
+}
+
+.bc-address-bar i {
+    color: var(--accent-success);
+    font-size: 0.6rem;
+    flex-shrink: 0;
+}
+
+.bc-address-bar span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ─── Browser viewport (clips the scaled iframe) ─────────────────── */
+.browser-viewport {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    background: var(--bg-primary);
+    cursor: pointer;
+}
+
+/* The scaling wrapper — dimensions set entirely by showcaseScaleAll() in JS */
+.iframe-scaler {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+    /* width / height / transform are all set by JS */
+}
+
+.iframe-scaler iframe {
+    display: block;
+    border: none;
+    background: #fff;
+    /* width / height are also set by JS */
+    transition: opacity var(--transition-slow);
+}
+
+.iframe-scaler iframe.loaded {
+    opacity: 1;
+}
+
+/* Transparent overlay so the iframe does not capture pointer events
+   before the user intentionally opens the full preview */
+.iframe-blocker {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    cursor: pointer;
+}
+
+/* Hover hint on the blocker */
+.browser-viewport:hover .iframe-blocker::after {
+    content: 'Click to open full preview';
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity var(--transition-fast);
+}
+
+
+/* ─── Shimmer loading state inside viewport ──────────────────────── */
+.viewport-shimmer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: opacity var(--transition-slow);
+}
+
+.viewport-shimmer.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.shimmer-line {
+    height: 10px;
+    width: 55%;
+    background: linear-gradient(
+        90deg,
+        var(--bg-tertiary) 25%,
+        var(--glass-border) 50%,
+        var(--bg-tertiary) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: shimmerMove 1.5s ease-in-out infinite;
+}
+
+.shimmer-line:nth-child(2) {
+    width: 38%;
+    animation-delay: 0.15s;
+}
+
+.shimmer-line:nth-child(3) {
+    width: 47%;
+    animation-delay: 0.3s;
+}
+
+@keyframes shimmerMove {
+    0%   { background-position:  200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.viewport-shimmer > span {
+    color: var(--text-tertiary);
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+}
+
+
+/* ─── Slide info panel (right column) ───────────────────────────────*/
+.slide-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 0.25rem 0;
+    min-width: 0;
+}
+
+.slide-lang-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.2rem 0.7rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    width: fit-content;
+}
+
+.slide-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    /* Prevent very long repo names from wrecking the layout */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.slide-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.slide-stats-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.slide-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.slide-stat-item i {
+    font-size: 0.7rem;
+    color: var(--accent-primary);
+}
+
+.slide-topics-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.slide-topic-tag {
+    padding: 0.175rem 0.55rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+}
+
+/* CTA buttons — pushed to bottom of the column */
+.slide-cta-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.slide-cta-primary,
+.slide-cta-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border: none;
+}
+
+.slide-cta-primary {
+    background: var(--accent-primary);
+    color: #fff;
+}
+
+.slide-cta-primary:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+}
+
+.slide-cta-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+}
+
+.slide-cta-secondary:hover {
+    background: var(--bg-secondary);
+    transform: translateY(-1px);
+}
+
+
+/* ─── Previous / Next buttons ────────────────────────────────────── */
+.sc-nav-btn {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.sc-nav-btn:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+
+/* ─── Dot indicators ─────────────────────────────────────────────── */
+.sc-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.sc-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--glass-border);
+    cursor: pointer;
+    padding: 0;
+    transition: all 300ms ease;
+}
+
+.sc-dot.active {
+    background: var(--accent-primary);
+    width: 22px;
+    border-radius: 4px;
+}
+
+.sc-dot:hover:not(.active) {
+    background: var(--text-tertiary);
+    transform: scale(1.2);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIVE PREVIEW MODAL
+═══════════════════════════════════════════════════════════════════ */
+.preview-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+}
+
+.preview-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.preview-modal {
+    width: 100%;
+    max-width: 1100px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* glass-panel provides background, border, blur, radius */
+    border-radius: var(--radius-xl) !important;
+    transform: scale(0.96);
+    transition: transform var(--transition-base);
+}
+
+.preview-modal-overlay.active .preview-modal {
+    transform: scale(1);
+}
+
+/* Chrome-style header bar */
+.preview-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--bg-tertiary);
+    flex-shrink: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.preview-modal-dots {
+    display: flex;
+    gap: 0.375rem;
+    flex-shrink: 0;
+}
+
+.preview-modal-title {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.preview-modal-actions {
+    display: flex;
+    gap: 0.375rem;
+    flex-shrink: 0;
+}
+
+.preview-action-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.preview-action-btn:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Iframe area */
+.preview-iframe-container {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+#preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+#preview-iframe.loaded {
+    opacity: 1;
+}
+
+#preview-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    z-index: 1;
+    transition: opacity var(--transition-base);
+}
+
+#preview-loading.hidden {
+    display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 960px)
+═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 960px) {
+    .showcase-slide {
+        grid-template-columns: 1fr 280px;
+        gap: 1rem;
+    }
+
+    .slide-title {
+        font-size: 1.2rem;
+    }
+
+    .slide-description {
+        -webkit-line-clamp: 2;
+    }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 768px)
+═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    #featured-showcase {
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .showcase-header h2 {
+        font-size: 1.75rem;
+    }
+
+    /* Stack to single column on mobile */
+    .showcase-stage {
+        height: auto;
+        min-height: auto;
+    }
+
+    .showcase-slide {
+        position: relative;  /* active slide drives height in single-col */
+        grid-template-columns: 1fr;
+        grid-template-rows: 240px auto;
+        gap: 0.875rem;
+        padding: 0.875rem;
+    }
+
+    /* Non-active slides stay absolute so they don't push layout */
+    .showcase-slide.from-right,
+    .showcase-slide.from-left {
+        position: absolute;
+    }
+
+    .browser-frame {
+        height: 240px;
+    }
+
+    .slide-info {
+        gap: 0.625rem;
+    }
+
+    .slide-title {
+        font-size: 1.1rem;
+        white-space: normal;
+    }
+
+    .slide-cta-row {
+        flex-direction: row;
+    }
+
+    .slide-cta-primary,
+    .slide-cta-secondary {
+        flex: 1;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.78rem;
+    }
+
+    .sc-nav-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.7rem;
+    }
+
+    .showcase-stage-container {
+        gap: 0.5rem;
+    }
+
+    /* Preview modal full-screen on mobile */
+    .preview-modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .preview-modal {
+        max-width: 100%;
+        height: 92vh;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+    }
+
+    .preview-modal-overlay.active .preview-modal {
+        transform: scale(1);
+    }
+}

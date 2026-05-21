@@ -187,6 +187,40 @@ class Portfolio:
         </div>
     </section>
 
+
+    <section id="featured-showcase" style="display:none">
+    <div class="showcase-wrapper">
+
+        <!-- Section header -->
+        <div class="showcase-header">
+            <h2>Live Project Showcase</h2>
+            <p>Click any preview to open the full site</p>
+        </div>
+
+        <!-- Auto-advance progress bar -->
+        <div class="sc-progress">
+            <div id="sc-progress-fill"></div>
+        </div>
+
+        <!-- Stage + navigation arrows -->
+        <div class="showcase-stage-container">
+            <button id="sc-prev" class="sc-nav-btn" aria-label="Previous slide">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <!-- Slides are injected here by initShowcase() -->
+            <div id="showcase-stage" class="showcase-stage"></div>
+
+            <button id="sc-next" class="sc-nav-btn" aria-label="Next slide">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Dot indicators — appended dynamically -->
+        <div id="sc-indicators" class="sc-indicators" role="tablist" aria-label="Slide indicators"></div>
+
+    </div>
+</section>
     <!-- Main Content -->
     <main class="main-content">
         <!-- Projects Tab -->
@@ -478,6 +512,46 @@ class Portfolio:
             <div class="modal-body" id="modal-body"></div>
         </div>
     </div>
+
+    <div class="preview-modal-overlay" id="preview-modal-overlay">
+    <div class="preview-modal glass-panel">
+
+        <!-- Modal chrome bar -->
+        <div class="preview-modal-header">
+            <div class="preview-modal-dots">
+                <span class="bc-dot r"></span>
+                <span class="bc-dot y"></span>
+                <span class="bc-dot g"></span>
+            </div>
+            <span id="preview-title" class="preview-modal-title">Live Preview</span>
+            <div class="preview-modal-actions">
+                <a id="preview-open-btn" href="#" target="_blank" rel="noopener noreferrer"
+                   class="preview-action-btn" title="Open in new tab">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+                <button id="preview-close-btn" class="preview-action-btn" title="Close preview">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Iframe area -->
+        <div class="preview-iframe-container">
+            <div id="preview-loading" class="preview-loading">
+                <div class="spinner"></div>
+                <p>Loading preview...</p>
+            </div>
+            <iframe
+                id="preview-iframe"
+                src=""
+                title="Live site preview"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                allow="fullscreen"
+            ></iframe>
+        </div>
+
+    </div>
+</div>
 
     <!-- Back to Top -->
     <button class="back-to-top" id="back-to-top">
