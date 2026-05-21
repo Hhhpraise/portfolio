@@ -1268,9 +1268,11 @@ function bindShowcaseControls() {
         showcaseGoTo((showcase.index - 1 + showcase.loaded.length) % showcase.loaded.length);
     });
 
-    next?.addEventListener('click', () => {
+     next?.addEventListener('click', () => {
         showcase.dir = 'right';
-        showcaseGoTo((showcase.index + 1) % showcase.loaded.length);
+        const nextIndex = (showcase.index + 1) % showcase.loaded.length;
+        showcaseGoTo(nextIndex);
+        showcaseMaybeExpand(nextIndex);
     });
 
     stage?.addEventListener('mouseenter', showcaseStopAuto);
@@ -1337,8 +1339,6 @@ function showcaseGoTo(index, animate = true) {
     showcaseLoadIframe((index - 1 + showcase.loaded.length) % showcase.loaded.length);
 
     // When the user reaches the last slide, queue the next project
-    showcaseMaybeExpand(index);
-
     showcaseResetProgress();
 }
 
