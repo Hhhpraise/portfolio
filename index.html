@@ -1,49 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Praise - Software Developer specializing in Python, JavaScript, Android, and Web Development. Clean, fast portfolio showcasing GitHub projects and skills.">
-    <meta name="keywords" content="software developer, python developer, javascript developer, android developer, web developer, github portfolio">
+    <meta name="description" content="Praise — Software Developer building clean, fast applications with Python, JavaScript, and modern web technologies.">
+    <meta name="keywords" content="software developer, python, javascript, android, web development, portfolio">
     <meta name="author" content="Praise (hhhpraise)">
     <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0a0a0a">
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://hhhpraise.github.io/portfolio/">
-    <meta property="og:title" content="Praise | Software Developer">
-    <meta property="og:description" content="Clean, fast portfolio showcasing Python, JavaScript, Android, and Web development projects.">
+    <meta property="og:title" content="Praise — Software Developer">
+    <meta property="og:description" content="Motion-rich portfolio showcasing live projects, open-source work, and publications.">
     <meta property="og:image" content="https://github.com/Hhhpraise.png">
 
-    <!-- Apple PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Praise Portfolio">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Praise">
 
-    <title>Praise | Software Developer</title>
+    <title>Praise — Software Developer</title>
     <link rel="canonical" href="https://hhhpraise.github.io/portfolio/">
     <link rel="icon" type="image/x-icon" href="https://github.com/Hhhpraise.png">
     <link rel="apple-touch-icon" href="https://github.com/Hhhpraise.png">
 
-    <!-- Fonts & Icons -->
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&f[]=geist@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- Structured Data -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Praise",
-        "alternateName": "hhhprace",
+        "alternateName": "hhhpraise",
         "url": "https://hhhpraise.github.io/portfolio/",
         "image": "https://github.com/Hhhpraise.png",
         "sameAs": [
             "https://github.com/Hhhpraise",
-            "https://www.instagram.com/__praisee"
+            "https://www.instagram.com/__praisee",
+            "https://orcid.org/0009-0007-8597-9017"
         ],
         "jobTitle": "Software Developer",
         "knowsAbout": ["Python", "JavaScript", "Android Development", "Web Development"],
@@ -52,517 +51,267 @@
     </script>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="liquid-background"></div>
-    <div class="glass-effect"></div>
 
-    <!-- Header -->
-    <header class="glass-header">
-        <div class="header-container">
-            <div class="brand">
-                <div class="logo">
-                    <div class="logo-icon">P</div>
-                    <span class="logo-text">praise</span>
-                </div>
-                <div class="tagline">Software Developer</div>
+    <!-- NAV -->
+    <nav class="nav" id="nav">
+        <div class="container nav-inner">
+            <a href="#" class="nav-logo" aria-label="Praise home">
+                <img src="https://github.com/Hhhpraise.png" alt="Praise" width="36" height="36">
+                <span>Praise</span>
+            </a>
+            <div class="nav-links" id="nav-links">
+                <a href="#live-pages" class="nav-link">Live</a>
+                <a href="#work" class="nav-link">Work</a>
+                <a href="#publications" class="nav-link">Papers</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <a href="https://github.com/Hhhpraise" target="_blank" rel="noopener" class="nav-cta">GitHub</a>
             </div>
-
-            <nav class="desktop-nav">
-                <a href="#projects" class="nav-link active" data-tab="projects">
-                    <i class="fas fa-code"></i>
-                    <span>Projects</span>
-                </a>
-                <a href="#skills" class="nav-link" data-tab="skills">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Skills</span>
-                </a>
-                <a href="#publications" class="nav-link" data-tab="publications">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Publications</span>
-                </a>
-            </nav>
-
-            <div class="header-actions">
-                <button class="theme-toggle" aria-label="Toggle theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <a href="https://github.com/Hhhpraise" target="_blank" class="github-btn" aria-label="GitHub">
-                    <i class="fab fa-github"></i>
-                    <span>GitHub</span>
-                </a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button class="mobile-menu-btn" aria-label="Menu">
+            <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
+    </nav>
 
-        <!-- Mobile Navigation -->
-        <nav class="mobile-nav">
-            <a href="#projects" class="mobile-nav-link active" data-tab="projects">
-                <i class="fas fa-code"></i>
-                <span>Projects</span>
-            </a>
-            <a href="#skills" class="mobile-nav-link" data-tab="skills">
-                <i class="fas fa-chart-line"></i>
-                <span>Skills</span>
-            </a>
-            <a href="#publications" class="mobile-nav-link" data-tab="publications">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Publications</span>
-            </a>
-            <div class="mobile-actions">
-                <a href="https://github.com/Hhhpraise" target="_blank" class="mobile-github">
-                    <i class="fab fa-github"></i>
-                    <span>View on GitHub</span>
-                </a>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <span class="gradient-text">Crafting Digital</span>
-                    <span class="gradient-text">Experiences</span>
-                </h1>
-                <p class="hero-subtitle">
-                    I build clean, efficient software with Python, JavaScript, and modern web technologies.
-                    My work focuses on creating solutions that are both beautiful and functional.
-                </p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <div class="stat-number" id="total-repos">0</div>
-                        <div class="stat-label">Projects</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number" id="total-stars">0</div>
-                        <div class="stat-label">Stars</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number" id="total-forks">0</div>
-                        <div class="stat-label">Forks</div>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="code-window">
-                    <div class="window-header">
-                        <div class="window-controls">
-                            <span class="control red"></span>
-                            <span class="control yellow"></span>
-                            <span class="control green"></span>
-                        </div>
-                        <span class="window-title">terminal</span>
-                    </div>
-                    <div class="window-content">
-                        <pre><code class="language-python">
-<span class="comment"># Building elegant solutions</span>
-class Portfolio:
-    def __init__(self):
-        self.skills = ["Python", "JavaScript", "Web", "Android"]
-        self.projects = []
-        self.passion = "infinite"
-
-    def create(self):
-        return clean_code()
-
-<span class="keyword">if</span> __name__ == "__main__":
-    praise = Portfolio()
-    praise.create()
-                        </code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="scroll-indicator">
-            <div class="mouse">
-                <div class="wheel"></div>
-            </div>
-            <span>Explore my work</span>
-        </div>
-    </section>
-
-
-    <section id="featured-showcase" style="display:none">
-    <div class="showcase-wrapper">
-
-        <!-- Section header -->
-        <div class="showcase-header">
-            <h2>Live Project Showcase</h2>
-            <p>Click any preview to open the full site</p>
-        </div>
-
-        <!-- Auto-advance progress bar -->
-        <div class="sc-progress">
-            <div id="sc-progress-fill"></div>
-        </div>
-
-        <!-- Stage + navigation arrows -->
-        <div class="showcase-stage-container">
-            <button id="sc-prev" class="sc-nav-btn" aria-label="Previous slide">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-
-            <!-- Slides are injected here by initShowcase() -->
-            <div id="showcase-stage" class="showcase-stage"></div>
-
-            <button id="sc-next" class="sc-nav-btn" aria-label="Next slide">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-
-        <!-- Dot indicators — appended dynamically -->
-        <div id="sc-indicators" class="sc-indicators" role="tablist" aria-label="Slide indicators"></div>
-
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobile-menu">
+        <button class="mobile-close" id="mobile-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+        <a href="#live-pages">Live Pages</a>
+        <a href="#work">Work</a>
+        <a href="#publications">Papers</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="https://github.com/Hhhpraise" target="_blank" rel="noopener">GitHub</a>
     </div>
-</section>
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Projects Tab -->
-        <section id="projects" class="tab-content active">
-            <div class="section-header">
-                <h2>Featured Projects</h2>
-                <p>A curated selection of my open-source work on GitHub</p>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <div class="hero-bg-orb hero-bg-orb-1"></div>
+            <div class="hero-bg-orb hero-bg-orb-2"></div>
+        </div>
+        <div class="hero-noise"></div>
+        <div class="hero-inner">
+            <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span> Available for work</div>
+            <h1 class="hero-title">
+                <span class="hero-title-line">I build software that</span>
+                <span class="hero-title-line accent">feels invisible.</span>
+            </h1>
+            <p class="hero-subtitle">Full-stack developer focused on Python, JavaScript, and Android. I create fast, clean applications where the interface disappears and the experience takes over.</p>
+            <div class="hero-actions">
+                <a href="#live-pages" class="hero-btn hero-btn-primary">See live projects <i class="fas fa-arrow-down"></i></a>
+                <a href="#contact" class="hero-btn hero-btn-secondary">Get in touch</a>
             </div>
-
-            <!-- Search & Filter -->
-            <div class="filter-container glass-panel">
-                <div class="search-wrapper">
-                    <i class="fas fa-search"></i>
-                    <input type="text"
-                           id="project-search"
-                           placeholder="Search projects..."
-                           class="search-input">
-                    <button id="clear-search" class="clear-search" aria-label="Clear search">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div class="filter-tags">
-                    <button class="filter-tag active" data-filter="all">All</button>
-                    <button class="filter-tag" data-filter="python">
-                        <i class="fab fa-python"></i> Python
-                    </button>
-                    <button class="filter-tag" data-filter="javascript">
-                        <i class="fab fa-js"></i> JavaScript
-                    </button>
-                    <button class="filter-tag" data-filter="web">
-                        <i class="fas fa-globe"></i> Web
-                    </button>
-                    <button class="filter-tag" data-filter="android">
-                        <i class="fab fa-android"></i> Android
-                    </button>
-                    <button class="filter-tag" data-filter="executable">
-                        <i class="fas fa-download"></i> Downloadable
-                    </button>
-                </div>
-
-                <div class="sort-controls">
-                    <label for="sort-select">Sort by:</label>
-                    <select id="sort-select" class="sort-select">
-                        <option value="updated">Last Updated</option>
-                        <option value="stars">Most Stars</option>
-                        <option value="created">Newest</option>
-                        <option value="name">Name (A-Z)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Projects Grid -->
-            <div class="projects-grid" id="projects-container">
-                <!-- Projects will be loaded here -->
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>Loading projects...</p>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div class="empty-state" id="empty-state" style="display: none;">
-                <i class="fas fa-folder-open"></i>
-                <h3>No projects found</h3>
-                <p>Try adjusting your search or filters</p>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination" id="pagination" style="display: none;">
-                <button class="pagination-btn prev" id="prev-page" disabled>
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="page-numbers" id="page-numbers"></div>
-                <button class="pagination-btn next" id="next-page" disabled>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </section>
-
-        <!-- Skills Tab -->
-        <section id="skills" class="tab-content">
-            <div class="section-header">
-                <h2>Skills & Expertise</h2>
-                <p>Technologies I work with and areas of expertise</p>
-            </div>
-
-            <div class="skills-container">
-                <div class="skills-category">
-                    <h3><i class="fas fa-code"></i> Programming Languages</h3>
-                    <div class="skill-bars">
-                        <div class="skill-bar">
-                            <div class="skill-info">
-                                <span class="skill-name">Python</span>
-                                <span class="skill-percent">90%</span>
-                            </div>
-                            <div class="skill-progress">
-                                <div class="skill-fill" data-width="90"></div>
-                            </div>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-info">
-                                <span class="skill-name">JavaScript</span>
-                                <span class="skill-percent">85%</span>
-                            </div>
-                            <div class="skill-progress">
-                                <div class="skill-fill" data-width="85"></div>
-                            </div>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-info">
-                                <span class="skill-name">Java</span>
-                                <span class="skill-percent">80%</span>
-                            </div>
-                            <div class="skill-progress">
-                                <div class="skill-fill" data-width="80"></div>
-                            </div>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-info">
-                                <span class="skill-name">HTML/CSS</span>
-                                <span class="skill-percent">95%</span>
-                            </div>
-                            <div class="skill-progress">
-                                <div class="skill-fill" data-width="95"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="skills-category">
-                    <h3><i class="fas fa-tools"></i> Tools & Technologies</h3>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Git</span>
-                        <span class="tech-tag">GitHub</span>
-                        <span class="tech-tag">VS Code</span>
-                        <span class="tech-tag">Android Studio</span>
-                        <span class="tech-tag">Docker</span>
-                        <span class="tech-tag">Node.js</span>
-                        <span class="tech-tag">React</span>
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">SQL</span>
-                        <span class="tech-tag">Qiskit</span>
-                        <span class="tech-tag">Figma</span>
-                        <span class="tech-tag">Linux</span>
-                    </div>
-                </div>
-
-                <div class="skills-category">
-                    <h3><i class="fas fa-chart-pie"></i> Language Distribution</h3>
-                    <div class="language-chart">
-                        <canvas id="languageChart"></canvas>
-                    </div>
-                    <div class="chart-info">
-                        <p>Based on actual GitHub repository data</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="github-stats glass-panel">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-code-branch"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="github-repos">0</div>
-                        <div class="stat-label">Public Repositories</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="github-stars">0</div>
-                        <div class="stat-label">Total Stars</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="github-followers">0</div>
-                        <div class="stat-label">GitHub Followers</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Publications Tab -->
-        <section id="publications" class="tab-content">
-            <div class="section-header">
-                <h2>Publications</h2>
-                <p>Academic papers and technical writings</p>
-            </div>
-
-            <div class="publications-container" id="publications-container">
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>Loading publications...</p>
-                </div>
-            </div>
-
-            <div class="empty-state" id="publications-empty" style="display: none;">
-                <i class="fas fa-book-open"></i>
-                <h3>No publications found</h3>
-                <p>Publications will appear here when available</p>
-            </div>
-        </section>
-    </main>
-
-    <!-- GitHub Promo Banner -->
-    <section class="github-banner glass-panel">
-        <div class="banner-content">
-            <div class="banner-icon">
-                <i class="fab fa-github"></i>
-            </div>
-            <div class="banner-text">
-                <h3>Explore All My Projects</h3>
-                <p>Discover more repositories, contributions, and open-source work on my GitHub profile.</p>
-            </div>
-            <a href="https://github.com/Hhhpraise" target="_blank" class="banner-btn">
-                View GitHub Profile
-                <i class="fas fa-arrow-right"></i>
-            </a>
+        </div>
+        <div class="hero-scroll">
+            <span>Scroll</span>
+            <div class="hero-scroll-line"></div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="glass-footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="footer-logo">P</div>
-                <div class="footer-info">
-                    <h4>Praise</h4>
-                    <p>Software Developer</p>
-                    <p class="footer-tagline">Building the future, one line at a time</p>
+    <!-- LIVE PAGES CAROUSEL -->
+    <section id="live-pages" class="carousel-section" style="display:none">
+        <div class="container">
+            <span class="section-label">Live Demos</span>
+            <h2 class="section-title">See my work<br>in action.</h2>
+            <p class="section-subtitle">Click any preview to open the full site. These are real, deployed projects.</p>
+        </div>
+        <div class="carousel-container">
+            <div class="carousel-progress"><div class="carousel-progress-fill" id="carousel-progress-fill"></div></div>
+            <div class="carousel-stage-wrapper">
+                <button class="carousel-nav carousel-prev" id="carousel-prev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+                <div class="carousel-stage" id="carousel-stage"></div>
+                <button class="carousel-nav carousel-next" id="carousel-next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="carousel-dots" id="carousel-dots"></div>
+        </div>
+    </section>
+
+    <!-- SKILLS MARQUEE -->
+    <div class="skills-marquee">
+        <div class="skills-track">
+            <div class="skills-track-inner">
+                <span class="skill-marquee-item">Python</span><span class="skill-marquee-item">JavaScript</span><span class="skill-marquee-item">Java</span><span class="skill-marquee-item">HTML/CSS</span><span class="skill-marquee-item">React</span><span class="skill-marquee-item">Node.js</span><span class="skill-marquee-item">Android</span><span class="skill-marquee-item">Git</span><span class="skill-marquee-item">Docker</span><span class="skill-marquee-item">SQL</span>
+                <span class="skill-marquee-item">Python</span><span class="skill-marquee-item">JavaScript</span><span class="skill-marquee-item">Java</span><span class="skill-marquee-item">HTML/CSS</span><span class="skill-marquee-item">React</span><span class="skill-marquee-item">Node.js</span><span class="skill-marquee-item">Android</span><span class="skill-marquee-item">Git</span><span class="skill-marquee-item">Docker</span><span class="skill-marquee-item">SQL</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORK: Bento + Catalog -->
+    <section id="work">
+        <div class="container">
+            <span class="section-label">Featured Work</span>
+            <h2 class="section-title">Projects worth<br>talking about.</h2>
+            <p class="section-subtitle">A curated selection pulled live from GitHub. Hover to explore, click to dive in.</p>
+
+            <!-- BENTO GRID -->
+            <div class="bento-grid" id="bento-grid">
+                <div class="bento-item span-2 span-2-row bento-loading">
+                    <div class="loading-spinner"></div>
                 </div>
             </div>
 
-            <div class="footer-links">
-                <h4>Connect</h4>
-                <div class="social-links">
-                    <a href="https://github.com/Hhhpraise" target="_blank" class="social-link">
-                        <i class="fab fa-github"></i>
-                        <span>GitHub</span>
-                    </a>
-                    <a href="https://www.instagram.com/__praisee" target="_blank" class="social-link">
-                        <i class="fab fa-instagram"></i>
-                        <span>Instagram</span>
-                    </a>
-                    <a href="mailto:hhhpraise33@gmail.com" class="social-link">
-                        <i class="fas fa-envelope"></i>
-                        <span>Email</span>
-                    </a>
+            <!-- REPO CATALOG -->
+            <div class="catalog-section" id="catalog-section">
+                <div class="catalog-header">
+                    <h3 class="catalog-title">All Repositories</h3>
+                    <p class="catalog-subtitle">Search, filter, and explore every public project.</p>
                 </div>
-            </div>
 
-            <div class="footer-stats">
-                <div class="visitor-counter">
-                    <i class="fas fa-eye"></i>
-                    <span id="visitor-count">0</span>
-                    <span>views today</span>
+                <div class="catalog-controls">
+                    <div class="catalog-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="catalog-search" class="catalog-search-input" placeholder="Search by name, language, or topic...">
+                        <button id="catalog-search-clear" class="catalog-search-clear" aria-label="Clear search"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <div class="catalog-filters" id="catalog-filters">
+                        <button class="catalog-filter active" data-filter="all">All</button>
+                        <button class="catalog-filter" data-filter="python"><i class="fab fa-python"></i> Python</button>
+                        <button class="catalog-filter" data-filter="javascript"><i class="fab fa-js"></i> JavaScript</button>
+                        <button class="catalog-filter" data-filter="java"><i class="fab fa-java"></i> Java</button>
+                        <button class="catalog-filter" data-filter="web"><i class="fas fa-globe"></i> Web</button>
+                        <button class="catalog-filter" data-filter="android"><i class="fab fa-android"></i> Android</button>
+                        <button class="catalog-filter" data-filter="demo"><i class="fas fa-play"></i> Has Demo</button>
+                        <button class="catalog-filter" data-filter="downloadable"><i class="fas fa-download"></i> Downloadable</button>
+                    </div>
+
+                    <div class="catalog-sort">
+                        <label for="catalog-sort-select">Sort:</label>
+                        <select id="catalog-sort-select" class="catalog-sort-select">
+                            <option value="stars">Most Stars</option>
+                            <option value="updated">Last Updated</option>
+                            <option value="name">Name (A-Z)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="last-updated">
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Updated: <span id="last-updated">just now</span></span>
+
+                <div class="catalog-grid" id="catalog-grid">
+                    <div class="loading-spinner"></div>
+                </div>
+
+                <div class="catalog-empty" id="catalog-empty" style="display:none">
+                    <i class="fas fa-search"></i>
+                    <h4>No repos match your search</h4>
+                    <p>Try different keywords or clear the filters.</p>
+                    <button class="catalog-empty-clear" id="catalog-empty-clear">Clear all filters</button>
+                </div>
+
+                <div class="catalog-pagination" id="catalog-pagination" style="display:none">
+                    <button class="pagination-btn" id="catalog-prev" disabled><i class="fas fa-chevron-left"></i></button>
+                    <div class="pagination-numbers" id="catalog-page-numbers"></div>
+                    <button class="pagination-btn" id="catalog-next" disabled><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="footer-bottom">
-            <p>&copy; <span id="current-year"></span> Praise. All rights reserved.</p>
-            <p class="built-with">
-                <span>Built with</span>
-                <i class="fas fa-heart"></i>
-                <span>using HTML, CSS & JavaScript</span>
-            </p>
+    <!-- PUBLICATIONS -->
+    <section id="publications">
+        <div class="container">
+            <span class="section-label">Research</span>
+            <h2 class="section-title">Published<br>work.</h2>
+            <p class="section-subtitle">Academic papers and technical publications, retrieved from my ORCID profile.</p>
+            <div class="publications-list" id="publications-list">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="publications-empty" id="publications-empty" style="display:none">
+                <i class="fas fa-book-open"></i>
+                <h4>Publications coming soon</h4>
+                <p>View my full profile at <a href="https://orcid.org/0009-0007-8597-9017" target="_blank" rel="noopener">orcid.org/0009-0007-8597-9017</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+        <div class="container">
+            <span class="section-label">About</span>
+            <h2 class="section-title">The person behind<br>the code.</h2>
+            <div class="about-grid">
+                <div class="about-visual">
+                    <div class="about-image-wrapper">
+                        <img src="https://github.com/Hhhpraise.png" alt="Praise" loading="lazy">
+                        <div class="about-image-border"></div>
+                    </div>
+                    <div class="about-accent-block"></div>
+                </div>
+                <div class="about-text">
+                    <p>I'm a software developer who believes the best code is the code you never notice. My work lives at the intersection of clean architecture, thoughtful interfaces, and relentless attention to detail.</p>
+                    <p>I build with Python for its clarity, JavaScript for its reach, and Java for its power on Android. Every project I ship starts with the same question: <em>will this make someone's life simpler?</em></p>
+                    <p>When I'm not writing code, you'll find me exploring new tools, contributing to open-source, or sketching out the next idea that refuses to leave my head.</p>
+                    <div class="about-stat-row">
+                        <div class="about-stat">
+                            <div class="about-stat-value" id="about-repos">0</div>
+                            <div class="about-stat-label">GitHub Repos</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="about-stat-value" id="about-stars">0</div>
+                            <div class="about-stat-label">Stars Earned</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="about-stat-value" id="about-followers">0</div>
+                            <div class="about-stat-label">Followers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+        <div class="container">
+            <span class="section-label">Contact</span>
+            <h2 class="section-title">Let's build something<br>together.</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Get in touch</h3>
+                    <p>I'm currently open to freelance opportunities and interesting projects. Whether you have a question, a collaboration idea, or just want to say hi — I'll get back to you.</p>
+                    <div class="contact-socials">
+                        <a href="https://github.com/Hhhpraise" target="_blank" rel="noopener" class="contact-social"><i class="fab fa-github"></i> GitHub</a>
+                        <a href="https://www.instagram.com/__praisee" target="_blank" rel="noopener" class="contact-social"><i class="fab fa-instagram"></i> Instagram</a>
+                        <a href="mailto:hhhpraise33@gmail.com" class="contact-social"><i class="fas fa-envelope"></i> Email</a>
+                    </div>
+                </div>
+                <form class="contact-form" id="contact-form" action="https://formspree.io/f/xwpvqdqn" method="POST">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" class="form-input" placeholder="Your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" class="form-textarea" placeholder="Tell me about your project..." required></textarea>
+                    </div>
+                    <button type="submit" class="form-submit">Send Message</button>
+                    <span class="form-success" id="form-success">Message sent! I'll get back to you soon.</span>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-inner">
+                <p class="footer-copy">&copy; <span id="current-year"></span> Praise. Built with intention.</p>
+                <div class="footer-links-row">
+                    <a href="https://github.com/Hhhpraise" target="_blank" rel="noopener" class="footer-link">GitHub</a>
+                    <a href="https://orcid.org/0009-0007-8597-9017" target="_blank" rel="noopener" class="footer-link">ORCID</a>
+                    <a href="mailto:hhhpraise33@gmail.com" class="footer-link">Email</a>
+                    <a href="#hero" class="footer-link">Back to top</a>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <!-- Project Modal -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal-content glass-panel">
-            <button class="modal-close" id="modal-close">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="modal-body" id="modal-body"></div>
-        </div>
-    </div>
-
-    <div class="preview-modal-overlay" id="preview-modal-overlay">
-    <div class="preview-modal glass-panel">
-
-        <!-- Modal chrome bar -->
-        <div class="preview-modal-header">
-            <div class="preview-modal-dots">
-                <span class="bc-dot r"></span>
-                <span class="bc-dot y"></span>
-                <span class="bc-dot g"></span>
-            </div>
-            <span id="preview-title" class="preview-modal-title">Live Preview</span>
-            <div class="preview-modal-actions">
-                <a id="preview-open-btn" href="#" target="_blank" rel="noopener noreferrer"
-                   class="preview-action-btn" title="Open in new tab">
-                    <i class="fas fa-external-link-alt"></i>
-                </a>
-                <button id="preview-close-btn" class="preview-action-btn" title="Close preview">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Iframe area -->
-        <div class="preview-iframe-container">
-            <div id="preview-loading" class="preview-loading">
-                <div class="spinner"></div>
-                <p>Loading preview...</p>
-            </div>
-            <iframe
-                id="preview-iframe"
-                src=""
-                title="Live site preview"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                allow="fullscreen"
-            ></iframe>
-        </div>
-
-    </div>
-</div>
-
-    <!-- Back to Top -->
-    <button class="back-to-top" id="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-
-    <!-- Toast Container -->
+    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

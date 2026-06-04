@@ -1,138 +1,67 @@
-# 🚀 Praise's Developer Portfolio
+# Praise — Software Developer Portfolio
 
-![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Deployed-success?style=flat-square&logo=github)
+![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-deployed-success?style=flat-square&logo=github)
 ![License](https://img.shields.io/github/license/Hhhpraise/portfolio?style=flat-square)
 ![Last Commit](https://img.shields.io/github/last-commit/Hhhpraise/portfolio?style=flat-square)
 
-A dynamic portfolio showcasing my projects, built with **HTML/CSS/JS** and powered by the GitHub API. Features dark mode, project filtering, and real-time GitHub data.
+A motion-rich developer portfolio built with vanilla HTML, CSS, and JavaScript. Showcases live GitHub Pages projects, academic publications from ORCID, and a searchable catalog of open-source repositories — all wrapped in a dark cinematic design with GSAP-powered scroll animations.
 
-**Live Demo:** 👉 [https://hhhpraise.github.io/portfolio/](https://hhhpraise.github.io/portfolio/)
-
----
-
-## 📚 Table of Contents
-
-- [Features](#-features)
-- [Technologies Used](#-technologies-used)
-- [How It Works](#-how-it-works)
-- [Deployment](#-deployment)
-- [Customization](#-customization)
-- [Accessibility](#-accessibility)
-- [Known Issues / Limitations](#-known-issues--limitations)
-- [Contributing](#-contributing)
-- [Contact](#-contact)
-- [License](#-license)
+**Live:** [hhhpraise.github.io/portfolio](https://hhhpraise.github.io/portfolio/)
 
 ---
 
-## ✨ Features
+## Features
 
-- **GitHub Integration**  
-  Fetches your repositories automatically using the GitHub API.
-- **Modern UI**  
-  Clean design with dark/light mode toggle (saves preference).
-- **Smart Filtering**  
-  Search and filter projects by tech stack (JavaScript, Python, etc.).
-- **Responsive**  
-  Works on mobile, tablet, and desktop.
-- **Animated**  
-  Smooth transitions and interactive elements.
+- **Live Pages Carousel** — Auto-advancing iframe previews of every deployed GitHub Pages project, with swipe and keyboard navigation
+- **Bento Grid** — Top 6 starred repos in a randomized gapless grid with 5 layout variants for visual variety
+- **Searchable Catalog** — Filter, search, and sort every public repository with paginated results
+- **Downloadable Projects** — Repos with GitHub Releases get a download badge and direct download button
+- **ORCID Publications** — Academic papers pulled automatically from your ORCID profile via the public API
+- **GSAP Scroll Animations** — Staggered hero reveal, ScrollTrigger-driven section entrances, and counter animations
+- **Responsive Design** — Desktop, tablet, and mobile layouts with priority reordering on small screens
+- **Contact Form** — Working form via Formspree with toast notifications
+- **Dark Theme** — Near-black palette with orange accent (`#ff3d00`), Satoshi display font, and Geist body font
 
----
+## Tech Stack
 
-## 🧰 Technologies Used
+| Category | Technology |
+|---|---|
+| Markup | HTML5, semantic elements, structured data (JSON-LD) |
+| Styling | CSS3, CSS Custom Properties, Grid, Flexbox, responsive breakpoints |
+| Scripting | Vanilla JavaScript (ES6+), no framework |
+| Animation | GSAP 3.12.5 with ScrollTrigger plugin |
+| Typography | Satoshi + Geist via Fontshare |
+| Icons | Font Awesome 6.4.0 |
+| APIs | GitHub REST API, ORCID Public API |
+| Forms | Formspree |
+| Hosting | GitHub Pages |
 
-- **Languages:** HTML, CSS, JavaScript
-- **Libraries:** (Vanilla JS; optionally integrate with frameworks)
-- **APIs:** [GitHub REST API](https://docs.github.com/en/rest)
-- **Deployment:** GitHub Pages
-- **Other:** Shields.io for badges
+## Quick Start
 
----
-
-## 🛠️ How It Works
-
-1. **Fetches Data**  
-   Uses the GitHub API to get your repositories (sorted by recent updates).
-2. **Generates Cards**  
-   Creates project cards with:
-   - Descriptions
-   - Stars/forks
-   - Tags (from repo topics/languages)
-   - Links to code and live demos (if GitHub Pages enabled)
-3. **Interactive UI**  
-   - Theme toggle (🌓/🌞)
-   - Search bar
-   - Filter buttons
-   - Scroll-to-top button
-
----
-
-## 🚀 Deployment
-
-This is a **GitHub Pages** site. To set up yours:
-1. Fork this repo or create a new one named `<username>.github.io`.
-2. Push your code to the `main` branch.
-3. Enable GitHub Pages in repo settings (under "Pages").
-
----
-
-## 🔧 Customization
-
-Edit these parts to personalize:
-- **Profile Info:** Update `index.html` (name, profile pic, social links).
-- **Styling:** Modify CSS variables in `<style>` (colors, fonts, etc.).
-- **Filters:** Add/remove tech stack buttons in the HTML.
-
-```html
-<!-- Example: Change profile section -->
-<div class="profile-header">
-  <img src="your-new-pic.jpg" class="profile-pic">
-  <div>
-    <h1>Your Name</h1>
-    <p>Your custom tagline</p>
-  </div>
-</div>
+```bash
+git clone https://github.com/Hhhpraise/portfolio.git
+cd portfolio
+# Open index.html in your browser — no build step required
 ```
 
----
+## Deployment
 
-## ♿ Accessibility
+Push to the `main` branch. GitHub Pages serves from the repository root or `docs/` folder depending on your settings.
 
-- Keyboard navigation supported for major interactive elements.
-- Sufficient color contrast for readability.
-- Responsive layout for screen readers and mobile devices.
-- If you have suggestions to further improve accessibility, please open an issue!
+## Customization
 
----
+1. **GitHub username** — Change `CONFIG.GITHUB_USER` in `script.js`
+2. **ORCID ID** — Change `CONFIG.ORCID_ID` in `script.js`
+3. **Formspree ID** — Change `CONFIG.FORMSPREE_ID` in `script.js` to your own form endpoint
+4. **Downloadable repos** — Add repo names to `CONFIG.EXECUTABLE_ALLOWLIST` or tag repos with `executable` on GitHub
+5. **Styling** — All colors, fonts, and spacing live in CSS custom properties at the top of `style.css`
 
-## 🚧 Known Issues / Limitations
+## Contact
 
-- Browser compatibility best in latest Chrome/Firefox/Edge; older IE not supported.
-- GitHub API rate limits may restrict frequent data refreshes.
-- No server-side rendering; all data is fetched client-side.
-- Filtering by tech stack depends on repo topics/language detection accuracy.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!  
-- **Bug reports:** Use [issues](../../issues) for bugs and feature requests.
-- **Pull requests:** Fork the repo, make changes on a branch, then submit a PR.
-- For major changes, open an issue first to discuss what you’d like to change.
-
----
-
-## 📬 Contact
-
-- Email: hhhpraise33@gmail.com
-- Twitter: [@Hhhpraise](https://twitter.com/Hhhpraise)
 - GitHub: [Hhhpraise](https://github.com/Hhhpraise)
+- Email: hhhpraise33@gmail.com
+- ORCID: [0009-0007-8597-9017](https://orcid.org/0009-0007-8597-9017)
 
----
+## License
 
-## 📄 License
-
-This project is licensed under the MIT License.  
-See the [LICENSE](./LICENSE) file for details.
+MIT — see [LICENSE](./LICENSE) for details.
