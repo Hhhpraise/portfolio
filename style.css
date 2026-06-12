@@ -36,24 +36,36 @@ img { max-width: 100%; display: block; }
 @media (min-width: 1200px) { .container { padding: 0 64px; } }
 
 /* ===== NAV ===== */
-.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 0; transition: background 0.4s var(--ease-out-expo), padding 0.4s var(--ease-out-expo); }
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 0; }
 .nav.scrolled { background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 0; border-bottom: 1px solid var(--border); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; }
 .nav-logo { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; }
 .nav-logo img { width: 36px; height: 36px; border-radius: var(--radius-sm); }
-.nav-links { display: none; gap: 28px; align-items: center; }
+.nav-links { display: none; gap: 28px; align-items: center; position: relative; }
 @media (min-width: 1024px) { .nav-links { display: flex; } }
-.nav-link { font-size: 0.875rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.01em; transition: color 0.2s; position: relative; }
+.nav-link { font-size: 0.875rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.01em; transition: color 0.2s; }
 .nav-link:hover, .nav-link.active { color: var(--text); }
-.nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px; background: var(--accent); transition: width 0.3s var(--ease-out-expo); }
-.nav-link:hover::after, .nav-link.active::after { width: 100%; }
 .nav-cta { padding: 8px 20px; background: var(--accent); color: #fff; border-radius: 999px; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.01em; transition: box-shadow 0.3s; }
 .nav-cta:hover { box-shadow: 0 0 24px var(--accent-glow); }
+
+.nav-underline {
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    height: 1.5px;
+    background: var(--accent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.nav-underline.visible {
+    opacity: 1;
+}
 .nav-mobile-btn { display: flex; width: 40px; height: 40px; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid var(--border); }
 @media (min-width: 1024px) { .nav-mobile-btn { display: none; } }
 
-.mobile-menu { position: fixed; inset: 0; z-index: 99; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-.mobile-menu.open { opacity: 1; pointer-events: auto; }
+.mobile-menu { position: fixed; inset: 0; z-index: 99; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+.mobile-menu.open { display: flex; pointer-events: auto; }
 .mobile-menu a { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; color: var(--text-muted); transition: color 0.2s; }
 .mobile-menu a:hover { color: var(--text); }
 .mobile-close { position: absolute; top: 24px; right: 24px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: var(--radius-sm); }
@@ -148,16 +160,14 @@ section { padding: 100px 0; }
 /* ===== SKILLS MARQUEE ===== */
 .skills-marquee { margin-top: 0; margin-bottom: 0; overflow: hidden; padding: 40px 0; }
 .skills-track { display: flex; width: max-content; }
-.skills-track-inner { display: flex; gap: 48px; animation: marquee 30s linear infinite; }
-@keyframes marquee { to { transform: translateX(-50%); } }
+.skills-track-inner { display: flex; gap: 48px; }
 .skill-marquee-item { font-family: var(--font-display); font-size: 3rem; font-weight: 700; color: var(--bg-elevated); -webkit-text-stroke: 1px var(--border-strong); white-space: nowrap; letter-spacing: -0.02em; }
-@media (min-width: 768px) { .skill-marquee-item { font-size: 4rem; } }
 
 /* ===== BENTO GRID ===== */
 .bento-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; grid-auto-rows: 260px; grid-auto-flow: dense; }
 @media (max-width: 1024px) { .bento-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 220px; } }
 @media (max-width: 640px) { .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 200px; } }
-.bento-item { position: relative; border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--border); cursor: pointer; transition: border-color 0.3s, transform 0.4s var(--ease-out-expo); }
+.bento-item { position: relative; border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--border); cursor: pointer; transition: border-color 0.3s, transform 0.4s var(--ease-out-expo); transform-style: preserve-3d; perspective: 800px; }
 .bento-item:hover { border-color: var(--border-strong); }
 .bento-item.span-2 { grid-column: span 2; }
 .bento-item.span-2-row { grid-row: span 2; }
@@ -179,6 +189,16 @@ section { padding: 100px 0; }
 .bento-link-demo { background: var(--accent); color: #fff; }
 .bento-link-demo:hover { box-shadow: 0 0 16px var(--accent-glow); }
 .bento-loading { display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+
+.bento-tilt-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(255,61,0,0.15) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
 
 /* ===== CATALOG ===== */
 .catalog-section { margin-top: 80px; }
@@ -321,3 +341,21 @@ section { padding: 100px 0; }
 
 /* ===== SR-ONLY ===== */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+/* ===== READING PROGRESS BAR ===== */
+.reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--accent);
+    z-index: 101;
+    pointer-events: none;
+    transform-origin: left center;
+}
+
+/* ===== SPLITTEXT GUARD ===== */
+.hero-title-line .char {
+    opacity: 1; /* SplitText sets inline opacity:0 for stagger; this prevents flash if JS fails */
+}

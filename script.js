@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchPublications();
     initGSAPAnimations();
     initContactForm();
+    initNavUnderline();
 });
 
 // ===== NAV =====
@@ -42,22 +43,44 @@ function initNav() {
     const navLinks = $$('#nav-links .nav-link');
     const mobileMenu = $('#mobile-menu');
 
+    // GSAP-driven nav background on scroll (smoother than CSS class toggle)
+    gsap.to(nav, {
+        scrollTrigger: {
+            trigger: 'body',
+            start: 'top top',
+            end: '+=80',
+            scrub: 0.5,
+            onUpdate: (self) => {
+                const progress = self.progress;
+                nav.style.background = `rgba(10, 10, 10, ${0.85 * progress})`;
+                nav.style.backdropFilter = `blur(${20 * progress}px)`;
+                nav.style.webkitBackdropFilter = `blur(${20 * progress}px)`;
+                nav.style.padding = `${20 - 8 * progress}px 0`;
+                nav.style.borderBottom = progress > 0.01 ? '1px solid rgba(255, 255, 255, 0.06)' : 'none';
+            }
+        }
+    });
+
+    // Active nav link tracking still uses scroll
     window.addEventListener('scroll', () => {
-        nav.classList.toggle('scrolled', window.scrollY > 60);
         updateActiveNavLink(navLinks);
     });
 
-    $('#nav-mobile-btn').addEventListener('click', () => mobileMenu.classList.add('open'));
-    $('#mobile-close').addEventListener('click', () => mobileMenu.classList.remove('open'));
-    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+    $('#nav-mobile-btn').addEventListener('click', openMobileMenu);
+    $('#mobile-close').addEventListener('click', closeMobileMenu);
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileMenu));
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                mobileMenu.classList.remove('open');
+                gsap.to(window, {
+                    duration: 1.2,
+                    scrollTo: { y: target, offsetY: 80 },
+                    ease: 'power3.inOut'
+                });
+                closeMobileMenu();
             }
         });
     });
@@ -72,6 +95,89 @@ function updateActiveNavLink(navLinks) {
     navLinks.forEach(link => {
         link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
     });
+}
+
+function initNavUnderline() {
+    const links = document.querySelectorAll('#nav-links .nav-link');
+    const underline = $('#nav-underline');
+    if (!links.length || !underline) return;
+
+    const navLinks = $('#nav-links');
+
+    function moveUnderline(link) {
+        const linkRect = link.getBoundingClientRect();
+        const navRect = navLinks.getBoundingClientRect();
+
+        gsap.to(underline, {
+            left: linkRect.left - navRect.left,
+            width: linkRect.width,
+            opacity: 1,
+            duration: 0.35,
+            ease: 'power2.out'
+        });
+    }
+
+    function hideUnderline() {
+        gsap.to(underline, {
+            opacity: 0,
+            duration: 0.2
+        });
+    }
+
+    links.forEach(link => {
+        link.addEventListener('mouseenter', () => moveUnderline(link));
+    });
+
+    navLinks.addEventListener('mouseleave', hideUnderline);
+
+    const activeLink = document.querySelector('#nav-links .nav-link.active');
+    if (activeLink) {
+        moveUnderline(activeLink);
+    }
+}
+
+function openMobileMenu() {
+    const menu = $('#mobile-menu');
+    const items = menu.querySelectorAll('a');
+    const closeBtn = $('#mobile-close');
+
+    menu.style.display = 'flex';
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl.fromTo(menu, { opacity: 0 }, { opacity: 1, duration: 0.3 })
+      .fromTo(closeBtn, { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.4 }, '-=0.15')
+      .fromTo(items, { opacity: 0, x: 60, scale: 0.9 }, {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: { each: 0.06, from: 'start' },
+          ease: 'back.out(1.7)'
+      }, '-=0.25');
+
+    menu.classList.add('open');
+}
+
+function closeMobileMenu() {
+    const menu = $('#mobile-menu');
+    const items = menu.querySelectorAll('a');
+
+    const tl = gsap.timeline({
+        defaults: { ease: 'power2.in' },
+        onComplete: () => {
+            menu.classList.remove('open');
+            menu.style.display = '';
+        }
+    });
+
+    tl.to(items, {
+        opacity: 0,
+        x: -40,
+        duration: 0.25,
+        stagger: { each: 0.04, from: 'end' }
+    })
+    .to(menu, { opacity: 0, duration: 0.2 }, '-=0.15');
 }
 
 // ===== GITHUB DATA =====
@@ -116,7 +222,7 @@ async function fetchGitHubProjects() {
         initCarousel();
         renderBentoGrid();
         initRepoCatalog();
-        initBentoGSAP();
+        initBentoTilt();
     } catch (err) {
         console.error('GitHub fetch error:', err);
         handleGitHubError();
@@ -377,6 +483,53 @@ function resetCarouselProgress() {
 }
 
 // ===== BENTO GRID =====
+function initBentoTilt() {
+    const items = document.querySelectorAll('.bento-item');
+    if (!items.length) return;
+
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    items.forEach(item => {
+        const glow = item.querySelector('.bento-tilt-glow');
+
+        item.addEventListener('mousemove', (e) => {
+            const rect = item.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -8;
+            const rotateY = ((x - centerX) / centerX) * 8;
+
+            gsap.to(item, {
+                rotateX: rotateX,
+                rotateY: rotateY,
+                duration: 0.5,
+                ease: 'power2.out'
+            });
+
+            if (glow) {
+                const percentX = (x / rect.width) * 100;
+                const percentY = (y / rect.height) * 100;
+                glow.style.background = `radial-gradient(circle at ${percentX}% ${percentY}%, rgba(255,61,0,0.18) 0%, transparent 60%)`;
+                gsap.to(glow, { opacity: 1, duration: 0.3 });
+            }
+        });
+
+        item.addEventListener('mouseleave', () => {
+            gsap.to(item, {
+                rotateX: 0,
+                rotateY: 0,
+                duration: 0.7,
+                ease: 'elastic.out(1, 0.4)'
+            });
+            if (glow) {
+                gsap.to(glow, { opacity: 0, duration: 0.4 });
+            }
+        });
+    });
+}
 function renderBentoGrid() {
     const display = state.projects.slice(0, 6);
     const bento = $('#bento-grid');
@@ -419,18 +572,11 @@ function renderBentoGrid() {
                     ${demoBtn}${dlBtn}
                 </div>
             </div>
+            <div class="bento-tilt-glow"></div>
         </div>`;
     }).join('');
 }
 
-function initBentoGSAP() {
-    $$('.bento-item').forEach((item, i) => {
-        gsap.from(item, {
-            scrollTrigger: { trigger: '#work', start: 'top 75%' },
-            opacity: 0, y: 40, scale: 0.96, duration: 0.7, delay: i * 0.1, ease: 'power3.out'
-        });
-    });
-}
 
 // ===== REPO CATALOG =====
 function initRepoCatalog() {
@@ -489,10 +635,10 @@ function initRepoCatalog() {
         filterAndRenderCatalog();
     });
 
-    filterAndRenderCatalog();
+    filterAndRenderCatalog(false);
 }
 
-function filterAndRenderCatalog() {
+function filterAndRenderCatalog(animate = true) {
     let filtered = [...state.catalogProjects];
 
     if (state.searchQuery) {
@@ -527,17 +673,25 @@ function filterAndRenderCatalog() {
         }
     });
 
-    renderCatalogPage();
+    renderCatalogPage(animate);
 }
 
-function renderCatalogPage() {
+function renderCatalogPage(animate = true) {
     const grid = $('#catalog-grid');
     const empty = $('#catalog-empty');
     const pagination = $('#catalog-pagination');
 
     if (!state.filteredCatalog.length) {
-        grid.innerHTML = '';
-        empty.style.display = 'block';
+        if (animate) {
+            const cards = grid.querySelectorAll('.catalog-card');
+            gsap.to(cards, { opacity: 0, y: -10, duration: 0.2, stagger: 0.02, onComplete: () => {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+            }});
+        } else {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+        }
         pagination.style.display = 'none';
         return;
     }
@@ -547,12 +701,12 @@ function renderCatalogPage() {
     const start = (state.currentPage - 1) * CONFIG.ITEMS_PER_PAGE;
     const pageItems = state.filteredCatalog.slice(start, start + CONFIG.ITEMS_PER_PAGE);
 
-    grid.innerHTML = pageItems.map(p => {
+    const newHTML = pageItems.map(p => {
         const dlBadge = p.isDownloadable ? `<span class="catalog-card-dl-badge"><i class="fas fa-download"></i> ${p.downloadSize || 'DL'}</span>` : '';
         const demoBtn = p.liveDemo ? `<a href="${p.liveDemo}" target="_blank" rel="noopener" class="catalog-card-btn catalog-card-btn-demo"><i class="fas fa-external-link-alt"></i> Live</a>` : '';
         const dlBtn = p.isDownloadable ? `<a href="${p.downloadUrl || p.url}" target="_blank" rel="noopener" class="catalog-card-btn catalog-card-btn-download"><i class="fas fa-download"></i> Download</a>` : '';
         return `
-        <div class="catalog-card">
+        <div class="catalog-card" style="opacity:0; transform:translateY(12px)">
             <div class="catalog-card-header">
                 <h3 class="catalog-card-name">${p.name.replace(/-/g, ' ')}${dlBadge}</h3>
                 <span class="catalog-card-stars"><i class="fas fa-star"></i> ${p.stars}</span>
@@ -567,7 +721,52 @@ function renderCatalogPage() {
         </div>`;
     }).join('');
 
-    renderCatalogPagination();
+    if (!animate) {
+        grid.innerHTML = newHTML;
+        renderCatalogPagination();
+        return;
+    }
+
+    // Animate out existing cards, then swap and animate in new ones
+    const existingCards = grid.querySelectorAll('.catalog-card');
+    if (existingCards.length) {
+        gsap.to(existingCards, {
+            opacity: 0,
+            y: -10,
+            duration: 0.2,
+            stagger: 0.02,
+            ease: 'power2.in',
+            onComplete: () => {
+                grid.innerHTML = newHTML;
+                const newCards = grid.querySelectorAll('.catalog-card');
+                gsap.to(newCards, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.35,
+                    stagger: 0.03,
+                    ease: 'power3.out',
+                    onComplete: () => {
+                        grid.querySelectorAll('.catalog-card').forEach(c => c.style.cssText = '');
+                    }
+                });
+                renderCatalogPagination();
+            }
+        });
+    } else {
+        grid.innerHTML = newHTML;
+        const newCards = grid.querySelectorAll('.catalog-card');
+        gsap.to(newCards, {
+            opacity: 1,
+            y: 0,
+            duration: 0.35,
+            stagger: 0.03,
+            ease: 'power3.out',
+            onComplete: () => {
+                grid.querySelectorAll('.catalog-card').forEach(c => c.style.cssText = '');
+            }
+        });
+        renderCatalogPagination();
+    }
 }
 
 function renderCatalogPagination() {
@@ -596,7 +795,11 @@ function renderCatalogPagination() {
         btn.addEventListener('click', () => {
             state.currentPage = parseInt(btn.dataset.page);
             renderCatalogPage();
-            $('#work').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            gsap.to(window, {
+                duration: 0.8,
+                scrollTo: { y: '#work', offsetY: 80 },
+                ease: 'power2.out'
+            });
         });
     });
 }
@@ -646,12 +849,189 @@ async function fetchPublications() {
 
 // ===== GSAP ANIMATIONS =====
 function initGSAPAnimations() {
-    gsap.timeline({ defaults: { ease: 'power3.out' } })
-        .from('.hero-eyebrow', { opacity: 0, y: 20, duration: 0.6 })
-        .from('.hero-title-line', { opacity: 0, y: 60, duration: 0.9, stagger: 0.15 }, '-=0.3')
-        .from('.hero-subtitle', { opacity: 0, y: 30, duration: 0.7 }, '-=0.4')
-        .from('.hero-actions', { opacity: 0, y: 20, duration: 0.6 }, '-=0.2')
-        .from('.hero-scroll', { opacity: 0, duration: 0.8 }, '-=0.2');
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+    // Helper: manually split text into character spans (avoids SplitText dependency)
+    function splitChars(el) {
+        const text = el.textContent;
+        el.innerHTML = '';
+        const chars = [];
+        [...text].forEach(char => {
+            const span = document.createElement('span');
+            span.className = 'char';
+            span.textContent = char;
+            span.style.display = char === ' ' ? 'inline' : 'inline-block';
+            el.appendChild(span);
+            chars.push(span);
+        });
+        return chars;
+    }
+
+    // Reduced motion: disable character-level animation and scrubbing
+    const mm = gsap.matchMedia();
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+        // SplitText hero title (manual char split)
+        const titleLines = document.querySelectorAll('.hero-title-line');
+        titleLines.forEach(line => {
+            const chars = splitChars(line);
+            gsap.from(chars, {
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 0,
+                y: 60,
+                rotationX: -40,
+                duration: 0.8,
+                stagger: { amount: 0.6, from: 'start' },
+                ease: 'power3.out'
+            });
+        });
+
+        // Bento grid — stagger items with scrub
+        const bentoItems = document.querySelectorAll('.bento-item');
+        if (bentoItems.length && document.querySelector('#work')) {
+            gsap.from(bentoItems, {
+                scrollTrigger: {
+                    trigger: '#work',
+                    start: 'top 60%',
+                    end: '+=600',
+                    scrub: 1,
+                    toggleActions: 'play none none none'
+                },
+                opacity: 0,
+                y: 60,
+                scale: 0.96,
+                duration: 1,
+                stagger: { each: 0.15, from: 'start' },
+                ease: 'power3.out'
+            });
+        }
+
+        // Parallax hero background orbs on scroll
+        const orbs = document.querySelectorAll('.hero-bg-orb');
+        if (orbs.length) {
+            orbs.forEach((orb, i) => {
+                gsap.to(orb, {
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: 1
+                    },
+                    y: i === 0 ? 120 : -100,
+                    x: i === 0 ? -40 : 60,
+                    ease: 'none'
+                });
+            });
+        }
+
+        // Publications — cards slide in from left with scrub
+        const pubCards = document.querySelectorAll('.publication-card');
+        if (pubCards.length) {
+            gsap.from(pubCards, {
+                scrollTrigger: {
+                    trigger: '#publications',
+                    start: 'top 65%',
+                    end: 'bottom 60%',
+                    scrub: 0.5
+                },
+                opacity: 0,
+                x: -80,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'power3.out'
+            });
+        }
+
+        // Reading progress bar
+        gsap.to('#reading-progress', {
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 0.3
+            },
+            width: '100%',
+            ease: 'none'
+        });
+
+        // Hero scroll indicator gentle bounce pulse
+        const scrollIndicator = document.querySelector('.hero-scroll');
+        if (scrollIndicator) {
+            gsap.to(scrollIndicator, {
+                y: 12,
+                duration: 1.4,
+                ease: 'power1.inOut',
+                yoyo: true,
+                repeat: -1,
+                delay: 2.5
+            });
+        }
+    });
+
+    mm.add('(prefers-reduced-motion: reduce)', () => {
+        // Simplified hero: just fade in whole title lines
+        gsap.from('.hero-title-line', {
+            scrollTrigger: { trigger: '.hero', start: 'top 80%', toggleActions: 'play none none none' },
+            opacity: 0,
+            duration: 0.6,
+            stagger: 0.1
+        });
+
+        // Simplified bento: just fade in
+        const bentoItems = document.querySelectorAll('.bento-item');
+        if (bentoItems.length) {
+            gsap.from(bentoItems, {
+                scrollTrigger: { trigger: '#work', start: 'top 75%' },
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.05
+            });
+        }
+
+        // Simplified publications: just fade in
+        const pubCards = document.querySelectorAll('.publication-card');
+        if (pubCards.length) {
+            gsap.from(pubCards, {
+                scrollTrigger: { trigger: '#publications', start: 'top 75%' },
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.05
+            });
+        }
+    });
+
+    // Animations safe for all motion preferences
+    gsap.from('.hero-eyebrow', {
+        scrollTrigger: { trigger: '.hero', start: 'top 80%', toggleActions: 'play none none none' },
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        delay: 0.2
+    });
+    gsap.from('.hero-subtitle', {
+        scrollTrigger: { trigger: '.hero', start: 'top 80%', toggleActions: 'play none none none' },
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        delay: 1.0
+    });
+    gsap.from('.hero-actions', {
+        scrollTrigger: { trigger: '.hero', start: 'top 80%', toggleActions: 'play none none none' },
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        delay: 1.3
+    });
+    gsap.from('.hero-scroll', {
+        scrollTrigger: { trigger: '.hero', start: 'top 80%', toggleActions: 'play none none none' },
+        opacity: 0,
+        duration: 0.8,
+        delay: 1.5
+    });
 
     $$('section .section-label, section .section-title, section .section-subtitle').forEach(el => {
         gsap.from(el, {
@@ -668,13 +1048,48 @@ function initGSAPAnimations() {
         scrollTrigger: { trigger: '#about', start: 'top 70%' },
         opacity: 0, x: 60, duration: 1, ease: 'power3.out', delay: 0.2
     });
-    gsap.from('.publication-card', {
-        scrollTrigger: { trigger: '#publications', start: 'top 75%' },
-        opacity: 0, y: 30, duration: 0.6, stagger: 0.1, ease: 'power3.out'
-    });
-    gsap.from('.catalog-card', {
-        scrollTrigger: { trigger: '#catalog-grid', start: 'top 85%' },
-        opacity: 0, y: 30, duration: 0.5, stagger: 0.05, ease: 'power3.out'
+
+    // Contact form stagger-in
+    const formGroups = document.querySelectorAll('.contact-form .form-group');
+    const formSubmit = document.querySelector('.contact-form .form-submit');
+    if (formGroups.length) {
+        gsap.from(formGroups, {
+            scrollTrigger: {
+                trigger: '#contact',
+                start: 'top 65%',
+                toggleActions: 'play none none none'
+            },
+            opacity: 0,
+            y: 30,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power3.out'
+        });
+        gsap.from(formSubmit, {
+            scrollTrigger: {
+                trigger: '#contact',
+                start: 'top 65%',
+                toggleActions: 'play none none none'
+            },
+            opacity: 0,
+            y: 20,
+            duration: 0.6,
+            delay: formGroups.length * 0.1 + 0.1,
+            ease: 'power3.out'
+        });
+    }
+
+    // Contact info panel slide-in
+    gsap.from('.contact-info', {
+        scrollTrigger: {
+            trigger: '#contact',
+            start: 'top 65%',
+            toggleActions: 'play none none none'
+        },
+        opacity: 0,
+        x: -50,
+        duration: 0.8,
+        ease: 'power3.out'
     });
 }
 
