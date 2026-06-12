@@ -723,6 +723,7 @@ function renderCatalogPage(animate = true) {
 
     if (!animate) {
         grid.innerHTML = newHTML;
+        grid.querySelectorAll('.catalog-card').forEach(c => c.style.cssText = '');
         renderCatalogPagination();
         return;
     }
