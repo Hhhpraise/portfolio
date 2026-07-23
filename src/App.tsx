@@ -7,6 +7,7 @@ import Carousel from './components/carousel/Carousel'
 import SkillMarquee from './components/shared/SkillMarquee'
 import Work from './components/work/Work'
 import Publications from './components/publications/Publications'
+import Activity from './components/activity/Activity'
 import About from './components/about/About'
 import Contact from './components/contact/Contact'
 import { useGitHubData } from './hooks/useGitHubData'
@@ -23,6 +24,7 @@ function App() {
           <SkillMarquee />
           <Work projects={projects} loading={loading} />
           <Publications />
+          <Activity />
           <About projects={projects} user={user} loading={loading} error={error} />
           <Contact />
         </Layout>

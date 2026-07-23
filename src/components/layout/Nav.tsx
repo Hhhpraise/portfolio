@@ -7,18 +7,11 @@ export default function Nav() {
   const underlineRef = useRef<HTMLSpanElement>(null);
   const reducedMotion = useReducedMotion();
 
-  // Smooth anchor scroll — use native scrollIntoView to avoid GSAP window jitter
+  // Close mobile menu on anchor click (Lenis handles the actual scroll)
   useEffect(() => {
     const handler = (e: Event) => {
       const anchor = (e.target as HTMLElement).closest('a[href^="#"]');
       if (!anchor) return;
-      const href = anchor.getAttribute('href');
-      if (!href || href === '#') return;
-      const target = document.querySelector(href);
-      if (!target) return;
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
       const menu = document.getElementById('mobile-menu');
       if (menu) {
         menu.classList.remove('open');
@@ -124,6 +117,7 @@ export default function Nav() {
           <a href="#live-pages" className="nav-link">Live</a>
           <a href="#work" className="nav-link">Work</a>
           <a href="#publications" className="nav-link">Papers</a>
+          <a href="#activity" className="nav-link">Activity</a>
           <a href="#about" className="nav-link">About</a>
           <a href="#contact" className="nav-link">Contact</a>
           <a href="https://github.com/Hhhpraise" target="_blank" rel="noopener" className="nav-cta">GitHub</a>

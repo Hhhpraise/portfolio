@@ -1,6 +1,7 @@
 import { useGSAP, splitChars, gsap } from '../../hooks/useGSAP';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import Aurora from '../reactbits/Aurora';
+import VantaWaves from '../reactbits/VantaWaves';
 import HeroContent from './HeroContent';
 import HeroScrollIndicator from './HeroScrollIndicator';
 
@@ -40,7 +41,10 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="hero" id="hero">
-      <div className="absolute inset-0 opacity-50">
+      <div className="absolute inset-0 z-0">
+        <VantaWaves color="#ff3d00" waveHeight={12} waveSpeed={0.4} shininess={20} zoom={0.7} />
+      </div>
+      <div className="absolute inset-0 opacity-40">
         <Aurora colorStops={['#ff3d00', '#7000ff', '#ff3d00']} amplitude={0.8} blend={0.5} />
       </div>
       <HeroContent />

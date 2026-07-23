@@ -1,4 +1,5 @@
 import Magnet from '../reactbits/Magnet';
+import BlurText from '../reactbits/BlurText';
 
 export default function HeroContent() {
   return (
@@ -13,9 +14,13 @@ export default function HeroContent() {
         <span className="hero-title-line accent">feels invisible.</span>
       </h1>
 
-      <p className="hero-subtitle">
-        Full-stack developer focused on Python, JavaScript, and Android. I create fast, clean applications where the interface disappears and the experience takes over.
-      </p>
+      <BlurText
+        text="Full-stack developer focused on Python, JavaScript, and Android. I create fast, clean applications where the interface disappears and the experience takes over."
+        className="hero-subtitle block text-text-muted text-[clamp(1rem,2vw,1.25rem)] max-w-[540px] mx-auto mb-12 leading-[1.7]"
+        direction="bottom"
+        delay={45}
+        animateBy="words"
+      />
 
       <div className="hero-actions">
         <Magnet padding={60} magnetStrength={4}>

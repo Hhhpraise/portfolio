@@ -7,38 +7,6 @@ export function formatFileSize(bytes: number): string {
   return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
-export function animateValue(
-  el: HTMLElement | null,
-  start: number,
-  end: number,
-  duration: number
-): void {
-  if (!el) return;
-  const startTime = performance.now();
-  function step(ts: number) {
-    const progress = Math.min((ts - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    el!.textContent = Math.floor(start + (end - start) * eased).toLocaleString();
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-export function splitChars(el: HTMLElement): HTMLSpanElement[] {
-  const text = el.textContent || '';
-  el.innerHTML = '';
-  const chars: HTMLSpanElement[] = [];
-  [...text].forEach((char) => {
-    const span = document.createElement('span');
-    span.className = 'char';
-    span.textContent = char;
-    span.style.display = char === ' ' ? 'inline' : 'inline-block';
-    el.appendChild(span);
-    chars.push(span);
-  });
-  return chars;
-}
-
 export async function fetchGitHubProjects(): Promise<{ projects: Project[]; user: { public_repos: number; followers: number } }> {
   const [reposRes, userRes] = await Promise.all([
     fetch(`https://api.github.com/users/${CONFIG.GITHUB_USER}/repos?per_page=100&sort=updated`),

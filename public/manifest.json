@@ -1,0 +1,21 @@
+{
+  "name": "Praise O. A — Software Developer & AI Engineer",
+  "short_name": "Praise",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "Full-stack developer portfolio showcasing projects in Python, JavaScript, Android, LLMs, and AI agents.",
+  "icons": [
+    {
+      "src": "https://avatars.githubusercontent.com/u/64196535",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://avatars.githubusercontent.com/u/64196535",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

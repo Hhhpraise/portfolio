@@ -1,26 +1,13 @@
-import { useEffect, useRef } from 'react';
 import { useGSAP, gsap } from '../../hooks/useGSAP';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { animateValue } from '../../utils/api';
+import CountUp from '../reactbits/CountUp';
 import type { Project } from '../../types';
 
 interface AboutProps { projects: Project[]; user: { public_repos: number; followers: number }; loading: boolean; error: string | null; }
 
-export default function About({ projects, user, loading }: AboutProps) {
+export default function About({ projects, user, loading: _loading }: AboutProps) {
   const reducedMotion = useReducedMotion();
-  const reposRef = useRef<HTMLSpanElement>(null);
-  const starsRef = useRef<HTMLSpanElement>(null);
-  const followersRef = useRef<HTMLSpanElement>(null);
-  const animated = useRef(false);
   const totalStars = projects.reduce((s, p) => s + p.stargazers_count, 0);
-
-  useEffect(() => {
-    if (animated.current || loading || projects.length === 0) return;
-    animated.current = true;
-    animateValue(reposRef.current, 0, user.public_repos || projects.length, 1200);
-    animateValue(starsRef.current, 0, totalStars, 1200);
-    animateValue(followersRef.current, 0, user.followers || 0, 1200);
-  }, [loading, projects, user, totalStars]);
 
   const sectionRef = useGSAP<HTMLElement>((ref) => {
     if (!ref.current || reducedMotion) return;
@@ -48,9 +35,9 @@ export default function About({ projects, user, loading }: AboutProps) {
             <p>I build with Python for its clarity, JavaScript for its reach, and Java for its power on Android. Every project I ship starts with the same question: <em>will this make someone's life simpler?</em></p>
             <p>When I'm not writing code, you'll find me exploring new tools, contributing to open-source, or sketching out the next idea that refuses to leave my head.</p>
             <div className="about-stat-row">
-              <div className="about-stat"><span ref={reposRef} className="about-stat-value">0</span><span className="about-stat-label">GitHub Repos</span></div>
-              <div className="about-stat"><span ref={starsRef} className="about-stat-value">0</span><span className="about-stat-label">Stars Earned</span></div>
-              <div className="about-stat"><span ref={followersRef} className="about-stat-value">0</span><span className="about-stat-label">Followers</span></div>
+              <div className="about-stat"><CountUp to={user.public_repos || projects.length} from={0} duration={2} className="about-stat-value" /><span className="about-stat-label">GitHub Repos</span></div>
+              <div className="about-stat"><CountUp to={totalStars} from={0} duration={2} className="about-stat-value" /><span className="about-stat-label">Stars Earned</span></div>
+              <div className="about-stat"><CountUp to={user.followers || 0} from={0} duration={2} className="about-stat-value" /><span className="about-stat-label">Followers</span></div>
             </div>
           </div>
         </div>
